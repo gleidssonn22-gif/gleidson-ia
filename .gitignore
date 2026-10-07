@@ -1,0 +1,13 @@
+# Python cache e ambiente
+__pycache__/
+*.pyc
+.venv/
+env/
+
+# Banco de dados local
+*.db
+*.sqlite3
+
+# Credenciais e segredos
+.env
+.DS_Store

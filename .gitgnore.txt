@@ -1,0 +1,14 @@
+# Ignora arquivos de ambiente com senhas reais (nunca sobem para o GitHub)
+.env
+
+# Ignora pastas de ambiente virtual do Python
+venv/
+env/
+ENV/
+
+# Ignora arquivos temporários gerados pelo Python
+__pycache__/
+*.pyc
+*.pyo
+*.pyd
+.DS_Store

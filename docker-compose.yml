@@ -1,0 +1,14 @@
+version: '3.8'
+
+services:
+  gleidson-app:
+    build: .
+    container_name: gleidson_assistant
+    restart: always
+    ports:
+      - "8501:8501"
+    environment:
+      - GEMINI_API_KEY=${GEMINI_API_KEY}
+    # Opcional: se quiser carregar direto do seu arquivo .env local
+    env_file:
+      - .env

@@ -1,0 +1,53 @@
+gleidson-assistant/
+├── .env.example          # Modelo das variáveis de ambiente necessárias
+├── .gitignore
+├── docker-compose.yml    # Orquestração de serviços (Banco vetorial, Redis, App)
+├── Dockerfile            # Containerização para deploy em produção
+├── README.md
+├── pyproject.toml        # Gerenciamento moderno de dependências (Poetry/Pipenv)
+│
+├── alembic/              # Migrações de banco de dados (se usar SQL)
+│
+├── src/                  # Código-fonte principal
+│   ├── __init__.py
+│   ├── main.py           # Entrypoint da aplicação (FastAPI / WebSockets)
+│   │
+│   ├── core/             # O "Cérebro" e Orquestração
+│   │   ├── __init__.py
+│   │   ├── agent.py      # Motor central de raciocínio (ReAct, Plan-and-Solve)
+│   │   ├── config.py     # Configurações globais (Pydantic Settings)
+│   │   ├── llm_router.py # Roteador inteligente de modelos (ex: barato para tarefas simples, avançado para raciocínio)
+│   │   └── security.py   # Guardrails, filtros de toxicidade e moderação
+│   │
+│   ├── memory/           # Gestão de Memória Avançada
+│   │   ├── __init__.py
+│   │   ├── short_term.py # Histórico de conversa recente (Redis)
+│   │   └── long_term.py  # Base de conhecimento vetorial para RAG (Chroma/Qdrant/PgVector)
+│   │
+│   ├── multimodal/       # Processamento de Mídia (Visão, Áudio, Documentos)
+│   │   ├── __init__.py
+│   │   ├── vision.py     # Análise de imagens e OCR
+│   │   ├── audio.py      # Transcrição (Speech-to-Text) e Síntese (Text-to-Speech)
+│   │   └── parser.py     # Leitor de PDFs, planilhas e arquivos complexos
+│   │
+│   ├── tools/            # Kit de Ferramentas (Function Calling / Plugins)
+│   │   ├── __init__.py
+│   │   ├── base.py       # Classe abstrata para padronizar ferramentas
+│   │   ├── web_search.py # Busca na web em tempo real (ex: Tavily, SerpAPI)
+│   │   ├── code_sandbox.py# Execução segura de código Python/JS gerado pela IA
+│   │   └── workspace.py  # Integração com ferramentas de produtividade
+│   │
+│   ├── api/              # Camada de Apresentação e Comunicação
+│   │   ├── __init__.py
+│   │   ├── v1/           # Rotas da API (Endpoints REST e WebSockets para streaming)
+│   │   │   ├── chat.py
+│   │   │   └── users.py
+│   │   └── middlewares/  # Autenticação, Rate Limiting e Logs
+│   │
+│   └── utils/            # Utilitários globais (Loggers estruturados, exceções)
+│       ├── __init__.py
+│       └── logger.py
+│
+└── tests/                # Testes unitários, de integração e de agentes
+    ├── unit/
+    └── integration/
