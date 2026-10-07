@@ -1,0 +1,88 @@
+<!DOCTYPE html>
+<html lang="pt-BR">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Gleidson IA - Clube Wins</title>
+    <style>
+        * { box-sizing: border-box; margin: 0; padding: 0; font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif; }
+        body { background-color: #0f172a; color: #f8fafc; display: flex; flex-direction: column; height: 100vh; justify-content: space-between; }
+        header { background-color: #1e293b; padding: 20px; text-align: center; border-bottom: 1px solid #334155; }
+        header h1 { font-size: 1.5rem; color: #38bdf8; }
+        #chat-container { flex: 1; overflow-y: auto; padding: 20px; display: flex; flex-direction: column; gap: 15px; max-width: 800px; width: 100%; margin: 0 auto; }
+        .message { padding: 12px 18px; border-radius: 12px; max-width: 75%; line-height: 1.5; word-wrap: break-word; }
+        .user { background-color: #0284c7; align-self: flex-end; border-bottom-right-radius: 2px; }
+        .bot { background-color: #334155; align-self: flex-start; border-bottom-left-radius: 2px; }
+        .input-container { background-color: #1e293b; padding: 20px; display: flex; gap: 10px; max-width: 800px; width: 100%; margin: 0 auto; border-top: 1px solid #334155; }
+        input { flex: 1; padding: 12px; border-radius: 8px; border: 1px solid #475569; background-color: #0f172a; color: #fff; font-size: 1rem; outline: none; }
+        input:focus { border-color: #38bdf8; }
+        button { background-color: #38bdf8; color: #0f172a; border: none; padding: 0 20px; border-radius: 8px; font-weight: bold; cursor: pointer; transition: background 0.2s; }
+        button:hover { background-color: #0ea5e9; }
+    </style>
+</head>
+<body>
+
+    <header>
+        <h1>Gleidson IA • Clube Wins</h1>
+    </header>
+
+    <div id="chat-container">
+        <div class="message bot">Olá! Sou o assistente inteligente do Clube Wins. Como posso te ajudar hoje?</div>
+    </div>
+
+    <div class="input-container">
+        <input type="text" id="user-input" placeholder="Digite sua mensagem..." onkeypress="handleKeyPress(event)">
+        <button onclick="enviarMensagem()">Enviar</button>
+    </div>
+
+    <script>
+        const API_URL = "https://gleidson-ia.onrender.com/chat/";
+
+        async function enviarMensagem() {
+            const input = document.getElementById("user-input");
+            const container = document.getElementById("chat-container");
+            const mensagem = input.value.trim();
+
+            if (!mensagem) return;
+
+            // Adiciona mensagem do usuário na tela
+            container.innerHTML += `<div class="message user">${mensagem}</div>`;
+            input.value = "";
+            container.scrollTop = container.scrollHeight;
+
+            // Mensagem temporária de carregamento
+            const loadingId = "loading-" + Date.now();
+            container.innerHTML += `<div id="${loadingId}" class="message bot">Pensando...</div>`;
+            container.scrollTop = container.scrollHeight;
+
+            try {
+                const response = await fetch(API_URL, {
+                    method: "POST",
+                    headers: { "Content-Type": "application/json" },
+                    body: JSON.stringify({ message: mensagem })
+                });
+
+                const data = await response.json();
+                document.getElementById(loadingId).remove();
+
+                if (response.ok) {
+                    container.innerHTML += `<div class="message bot">${data.response}</div>`;
+                } else {
+                    container.innerHTML += `<div class="message bot" style="color: #f87171;">Erro ao processar a resposta.</div>`;
+                }
+            } catch (error) {
+                document.getElementById(loadingId).remove();
+                container.innerHTML += `<div class="message bot" style="color: #f87171;">Erro de conexão com o servidor.</div>`;
+            }
+
+            container.scrollTop = container.scrollHeight;
+        }
+
+        function handleKeyPress(event) {
+            if (event.key === "Enter") {
+                enviarMensagem();
+            }
+        }
+    </script>
+</body>
+</html>
