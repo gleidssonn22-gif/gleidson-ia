@@ -4,6 +4,8 @@
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>Gleidson IA • Clube Wins</title>
+    <!-- Metatag do Google AdSense para verificação de propriedade -->
+    <meta name="google-adsense-account" content="ca-pub-8005983262078707">
     <style>
         * { box-sizing: border-box; margin: 0; padding: 0; font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif; }
         body { background-color: #0f172a; color: #f8fafc; display: flex; flex-direction: column; height: 100vh; justify-content: space-between; }
@@ -38,7 +40,7 @@
     </div>
 
     <script>
-        // ATENÇÃO: Atualize esta URL com o seu novo backend ativo (já que removeu o Render)
+        // ATENÇÃO: Atualize esta URL com o seu novo backend ativo
         const API_URL = "https://seu-novo-backend.com/chat/";
 
         const input = document.getElementById("user-input");
@@ -58,15 +60,11 @@
             const mensagem = input.value.trim();
             if (!mensagem) return;
 
-            // Desativa os inputs temporariamente para evitar envios duplicados
             input.value = "";
             input.disabled = true;
             sendBtn.disabled = true;
 
-            // Adiciona a mensagem do usuário na tela
             adicionarMensagem(mensagem, "user");
-
-            // Indicador de "Pensando..."
             const loadingDiv = adicionarMensagem("Pensando...", "bot");
 
             try {
@@ -88,7 +86,6 @@
                 loadingDiv.remove();
                 adicionarMensagem("Erro de conexão com o servidor da IA.", "bot error");
             } finally {
-                // Reativa a caixa de texto e o botão
                 input.disabled = false;
                 sendBtn.disabled = false;
                 input.focus();
