@@ -1,0 +1,102 @@
+<!DOCTYPE html>
+<html lang="pt-BR">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Gleidson IA • Clube Wins</title>
+    <!-- Script do Google AdSense -->
+    <script async src="https://pagead2.googlesyndication.com/pagead/js/adsbygoogle.js?client=ca-pub-8005983262078707" crossorigin="anonymous"></script>
+    <style>
+        * { box-sizing: border-box; margin: 0; padding: 0; font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif; }
+        body { background-color: #0f172a; color: #f8fafc; display: flex; flex-direction: column; height: 100vh; justify-content: space-between; }
+        header { background-color: #1e293b; padding: 20px; text-align: center; border-bottom: 1px solid #334155; }
+        header h1 { font-size: 1.5rem; color: #38bdf8; }
+        #chat-container { flex: 1; overflow-y: auto; padding: 20px; display: flex; flex-direction: column; gap: 15px; max-width: 800px; width: 100%; margin: 0 auto; scroll-behavior: smooth; }
+        .message { padding: 14px 18px; border-radius: 12px; max-width: 80%; line-height: 1.6; word-wrap: break-word; white-space: pre-wrap; font-size: 0.95rem; }
+        .user { background-color: #0284c7; align-self: flex-end; border-bottom-right-radius: 2px; color: #fff; }
+        .bot { background-color: #334155; align-self: flex-start; border-bottom-left-radius: 2px; color: #f8fafc; box-shadow: 0 4px 6px -1px rgba(0,0,0,0.1); }
+        .error { background-color: #7f1d1d; color: #fca5a5; border: 1px solid #991b1b; }
+        .input-container { background-color: #1e293b; padding: 20px; display: flex; gap: 10px; max-width: 800px; width: 100%; margin: 0 auto; border-top: 1px solid #334155; }
+        input { flex: 1; padding: 14px; border-radius: 8px; border: 1px solid #475569; background-color: #0f172a; color: #fff; font-size: 1rem; outline: none; transition: border-color 0.2s; }
+        input:focus { border-color: #38bdf8; }
+        button { background-color: #38bdf8; color: #0f172a; border: none; padding: 0 24px; border-radius: 8px; font-weight: bold; cursor: pointer; transition: background 0.2s; }
+        button:hover { background-color: #0ea5e9; }
+        button:disabled { background-color: #475569; cursor: not-allowed; opacity: 0.7; }
+    </style>
+</head>
+<body>
+
+    <header>
+        <h1>Gleidson IA • Clube Wins</h1>
+    </header>
+
+    <div id="chat-container">
+        <div class="message bot">Olá! Sou o assistente inteligente do Clube Wins. Como posso te ajudar hoje?</div>
+    </div>
+
+    <div class="input-container">
+        <input type="text" id="user-input" placeholder="Digite sua mensagem..." autocomplete="off">
+        <button id="send-btn" onclick="enviarMensagem()">Enviar</button>
+    </div>
+
+    <script>
+        // ATENÇÃO: Atualize esta URL com o seu novo backend ativo quando necessário
+        const API_URL = "https://seu-novo-backend.com/chat/";
+
+        const input = document.getElementById("user-input");
+        const sendBtn = document.getElementById("send-btn");
+        const container = document.getElementById("chat-container");
+
+        function adicionarMensagem(texto, tipo) {
+            const div = document.createElement("div");
+            div.className = `message ${tipo}`;
+            div.textContent = texto;
+            container.appendChild(div);
+            container.scrollTop = container.scrollHeight;
+            return div;
+        }
+
+        async function enviarMensagem() {
+            const mensagem = input.value.trim();
+            if (!mensagem) return;
+
+            input.value = "";
+            input.disabled = true;
+            sendBtn.disabled = true;
+
+            adicionarMensagem(mensagem, "user");
+            const loadingDiv = adicionarMensagem("Pensando...", "bot");
+
+            try {
+                const response = await fetch(API_URL, {
+                    method: "POST",
+                    headers: { "Content-Type": "application/json" },
+                    body: JSON.stringify({ message: mensagem })
+                });
+
+                const data = await response.json();
+                loadingDiv.remove();
+
+                if (response.ok) {
+                    adicionarMensagem(data.response || "Resposta vazia do servidor.", "bot");
+                } else {
+                    adicionarMensagem("Não consegui processar a resposta no momento.", "bot error");
+                }
+            } catch (error) {
+                loadingDiv.remove();
+                adicionarMensagem("Erro de conexão com o servidor da IA.", "bot error");
+            } finally {
+                input.disabled = false;
+                sendBtn.disabled = false;
+                input.focus();
+            }
+        }
+
+        input.addEventListener("keypress", (event) => {
+            if (event.key === "Enter") {
+                enviarMensagem();
+            }
+        });
+    </script>
+</body>
+</html>
