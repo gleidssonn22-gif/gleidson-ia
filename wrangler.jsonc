@@ -3,31 +3,11 @@
   "name": "gleidson-ia",
   "main": "src/index.js",
   "compatibility_date": "2026-10-09",
-
-  // --- CONFIGURAÇÃO DO DOMÍNIO CLUBEWINS.COM.BR ---
+  
   "routes": [
     {
       "pattern": "clubewins.com.br",
       "custom_domain": true
-    },
-    {
-      "pattern": "www.clubewins.com.br",
-      "custom_domain": true
-    }
-  ],
-
-  // --- BINDINGS GRATUITOS (BANCO DE DADOS E CACHE) ---
-  "d1_databases": [
-    {
-      "binding": "DB",
-      "database_name": "gleidson-ia-db",
-      "database_id": "COLE_O_ID_DO_D1_AQUI"
-    }
-  ],
-  "kv_namespaces": [
-    {
-      "binding": "CACHE",
-      "id": "COLE_O_ID_DO_KV_AQUI"
     }
   ]
 }
