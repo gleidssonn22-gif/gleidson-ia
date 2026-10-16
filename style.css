@@ -47,6 +47,62 @@ h1 {
     margin-top: 5px;
 }
 
+/* ========== ANÚNCIOS ========== */
+.ad-container {
+    margin: 15px 0;
+    text-align: center;
+    background: rgba(255,255,255,0.03);
+    border-radius: 8px;
+    padding: 10px;
+    min-height: 90px;
+}
+
+.ad-label {
+    font-size: 0.7rem;
+    color: #666;
+    text-transform: uppercase;
+    margin-bottom: 5px;
+}
+
+/* ========== DESTAQUES ========== */
+.features {
+    display: grid;
+    grid-template-columns: repeat(auto-fit, minmax(250px, 1fr));
+    gap: 15px;
+    margin: 10px 0 25px;
+}
+
+.feature-card {
+    background: rgba(255, 215, 0, 0.08);
+    border: 1px solid rgba(255, 215, 0, 0.2);
+    border-radius: 12px;
+    padding: 20px;
+    text-align: center;
+    transition: transform 0.3s, box-shadow 0.3s;
+}
+
+.feature-card:hover {
+    transform: translateY(-5px);
+    box-shadow: 0 10px 30px rgba(255, 215, 0, 0.15);
+}
+
+.feature-icon {
+    font-size: 2rem;
+    margin-bottom: 10px;
+}
+
+.feature-title {
+    color: #ffd700;
+    font-weight: bold;
+    margin-bottom: 5px;
+}
+
+.feature-desc {
+    color: #aaa;
+    font-size: 0.9rem;
+}
+
+/* ========== CHAT ========== */
 #chat-container {
     background: rgba(255, 255, 255, 0.05);
     border-radius: 16px;
@@ -55,7 +111,7 @@ h1 {
     border: 1px solid rgba(255, 255, 255, 0.1);
     display: flex;
     flex-direction: column;
-    height: 70vh;
+    height: 65vh;
 }
 
 #messages {
@@ -106,6 +162,19 @@ h1 {
     border-top-right-radius: 4px;
 }
 
+.typing .text::after {
+    content: '';
+    animation: dots 1.5s infinite;
+}
+
+@keyframes dots {
+    0% { content: ''; }
+    33% { content: '.'; }
+    66% { content: '..'; }
+    100% { content: '...'; }
+}
+
+/* ========== FORMULÁRIO ========== */
 #chat-form {
     display: flex;
     gap: 10px;
@@ -149,6 +218,7 @@ button:disabled {
     transform: none;
 }
 
+/* ========== RODAPÉ ========== */
 footer {
     text-align: center;
     color: #666;
@@ -156,14 +226,19 @@ footer {
     padding: 10px;
 }
 
-.typing .text::after {
-    content: '';
-    animation: dots 1.5s infinite;
+/* ========== RESPONSIVO ========== */
+@media (max-width: 600px) {
+    h1 { font-size: 1.5rem; }
+    .message .text { max-width: 85%; }
+    button { padding: 12px 20px; }
+    .features { grid-template-columns: 1fr; }
 }
 
-@keyframes dots {
-    0% { content: ''; }
-    33% { content: '.'; }
-    66% { content: '..'; }
-    100% { content: '...'; }
+html {
+    scroll-behavior: smooth;
+}
+
+::selection {
+    background: rgba(255, 215, 0, 0.3);
+    color: #fff;
 }
