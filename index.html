@@ -1,0 +1,67 @@
+<!DOCTYPE html>
+<html lang="pt-BR">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <meta name="description" content="Gleidson IA — Sua assistente inteligente no Clube Wins">
+    <title>Gleidson IA | Clube Wins</title>
+    <link rel="stylesheet" href="style.css">
+    <link rel="icon" type="image/svg+xml" href="data:image/svg+xml,<svg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 100 100'><text y='.9em' font-size='90'>G</text></svg>">
+</head>
+<body>
+    <!-- Cabeçalho -->
+    <header class="app-header">
+        <div class="header-wrapper">
+            <a href="index.html" class="brand">
+                <div class="brand-icon">G</div>
+                <div class="brand-text">
+                    <span class="brand-name">Gleidson <strong>IA</strong></span>
+                    <span class="brand-tag">Clube Wins</span>
+                </div>
+            </a>
+            <div class="connection-status">
+                <span class="status-dot"></span>
+                <span class="status-label">Online</span>
+            </div>
+        </div>
+    </header>
+
+    <!-- Área do Chat -->
+    <main class="chat-wrapper">
+        <div id="chat-messages" class="messages-container">
+            <!-- Mensagem de Boas-vindas -->
+            <div class="message ai-message">
+                <div class="message-avatar">🤖</div>
+                <div class="message-content">
+                    <p><strong>Olá! Eu sou o Gleidson IA</strong> 🤖✨</p>
+                    <p>Estou aqui para te ajudar com perguntas, textos, ideias, estudos e muito mais.</p>
+                    <p class="message-tip">💡 <em>Exemplo: "Me explique como funciona a inteligência artificial"</em></p>
+                </div>
+            </div>
+        </div>
+    </main>
+
+    <!-- Área de Entrada -->
+    <footer class="input-footer">
+        <form id="chat-form" class="input-form">
+            <input 
+                type="text" 
+                id="user-input" 
+                class="message-input"
+                placeholder="Digite sua mensagem..." 
+                autocomplete="off"
+                spellcheck="false"
+                required
+            >
+            <button type="submit" id="enviar-btn" class="send-button" aria-label="Enviar mensagem">
+                <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5">
+                    <path d="M22 2L11 13M22 2l-7 20-4-9-9-4 20-7z"/>
+                </svg>
+            </button>
+        </form>
+        <p class="disclaimer">A IA pode cometer erros. Sempre confira informações importantes.</p>
+    </footer>
+
+    <script src="script.js"></script>
+</body>
+</html>
