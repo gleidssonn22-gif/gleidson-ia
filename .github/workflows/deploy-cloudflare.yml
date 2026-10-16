@@ -6,7 +6,7 @@ on:
 
 jobs:
   build-and-deploy:
-    runs-on: ubuntu-latest
+    runs-on: ubuntu-24.04
     steps:
       - name: Baixar código
         uses: actions/checkout@v4
@@ -18,30 +18,33 @@ jobs:
 
       - name: Instalar uv
         run: curl -LsSf https://astral.sh/uv/install.sh | sh
-        env:
-          UV_NO_MODERN_INSTALL: 1
 
       - name: Adicionar uv ao PATH
         run: echo "$HOME/.cargo/bin" >> $GITHUB_PATH
 
-      - name: Instalar dependências Python
+      - name: Instalar dependências
         run: uv pip install -r requisitos.txt --system
 
       - name: Instalar Node.js
         uses: actions/setup-node@v4
         with:
-          node-version: "20"
+          node-version: "22"
 
       - name: Instalar stlite-cloudflare
         run: npm install -g @stlite/cloudflare
 
       - name: Construir o app
-        run: npx stlite-cloudflare build . --entrypoint src/main.py --out ../deploy-dist
+        run: |
+          mkdir -p saida
+          npx stlite-cloudflare build . --entrypoint src/main.py --out ./saida
+
+      - name: Verificar arquivos gerados
+        run: ls -R ./saida
 
       - name: Publicar no Cloudflare
         uses: cloudflare/wrangler-action@v3
         with:
           apiToken: ${{ secrets.CLOUDFLARE_API_TOKEN }}
           accountId: ${{ secrets.CLOUDFLARE_ACCOUNT_ID }}
-          workingDirectory: ../deploy-dist
+          workingDirectory: ./saida
           command: deploy --yes
