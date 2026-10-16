@@ -1,13 +1,6 @@
 {
-  "$schema": "node_modules/wrangler/config-schema.json",
   "name": "gleidson-ia",
-  "main": "src/index.js",
-  "compatibility_date": "2026-10-09",
-  
-  "routes": [
-    {
-      "pattern": "clubewins.com.br",
-      "custom_domain": true
-    }
-  ]
+  "compatibility_date": "2024-09-23",
+  "main": "src/entry.py",
+  "account_id": "${{ secrets.CLOUDFLARE_ACCOUNT_ID }}"
 }
