@@ -1,121 +1,82 @@
-const inputElement = document.getElementById('user-input');
-const sendButton = document.getElementById('enviar-btn');
-const messagesContainer = document.getElementById('chat-messages');
-const chatForm = document.getElementById('chat-form');
+const form = document.getElementById('chat-form');
+const input = document.getElementById('message-input');
+const messagesDiv = document.getElementById('messages');
 
-const API_URL = 'https://clubewins.com.br/api/chat';
-let isProcessing = false;
+let conversationHistory = [];
 
-async function enviarMensagem(event) {
-    event?.preventDefault();
+form.addEventListener('submit', async (e) => {
+    e.preventDefault();
+    const message = input.value.trim();
+    if (!message) return;
+
+    addMessage('user', message);
+    input.value = '';
     
-    const texto = inputElement.value.trim();
-    if (!texto || isProcessing) return;
-
-    isProcessing = true;
-    inputElement.disabled = true;
-    sendButton.disabled = true;
-
-    adicionarMensagem(texto, 'user');
-    inputElement.value = '';
-
-    const idDigitando = mostrarDigitando();
+    const typingId = showTyping();
 
     try {
-        const headers = { 'Content-Type': 'application/json' };
-        const resposta = await fetch(API_URL, {
-            method: 'POST',
-            headers: headers,
-            body: JSON.stringify({ message: texto })
-        });
-
-        removerDigitando(idDigitando);
-
-        if (!resposta.ok) throw new Error(`Servidor respondeu com erro: ${resposta.status}`);
-
-        const dados = await resposta.json();
-        const respostaTexto = dados.reply || dados.resposta || "Resposta recebida!";
-        adicionarMensagem(respostaTexto, 'ai');
-
-    } catch (erro) {
-        removerDigitando(idDigitando);
-        console.error('❌ Erro:', erro);
-        adicionarMensagem(
-            `⚠️ Ops! Não consegui conectar.\n\nDetalhe: ${erro.message}\n\nTente novamente em instantes.`, 
-            'ai'
-        );
-    } finally {
-        isProcessing = false;
-        inputElement.disabled = false;
-        sendButton.disabled = false;
-        inputElement.focus();
+        const response = await getAIResponse(message);
+        hideTyping(typingId);
+        addMessage('bot', response);
+    } catch (error) {
+        hideTyping(typingId);
+        addMessage('bot', 'Desculpe, tive um problema. Tente novamente em instantes.');
+        console.error(error);
     }
-}
+});
 
-function adicionarMensagem(texto, remetente) {
+function addMessage(type, text) {
     const div = document.createElement('div');
-    div.classList.add('message', `${remetente}-message`);
-
-    if (remetente === 'ai') {
-        div.innerHTML = `
-            <div class="message-avatar">🤖</div>
-            <div class="message-content">${formatarTexto(texto)}</div>
-        `;
-    } else {
-        div.innerHTML = `
-            <div class="message-content">${formatarTexto(texto)}</div>
-            <div class="message-avatar">👤</div>
-        `;
-    }
-
-    messagesContainer.appendChild(div);
-    rolarParaBaixo();
-}
-
-function mostrarDigitando() {
-    const id = `digitando-${Date.now()}`;
-    const div = document.createElement('div');
-    div.id = id;
-    div.classList.add('message', 'ai-message', 'typing-indicator');
+    div.className = `message ${type}`;
     div.innerHTML = `
-        <div class="message-avatar">🤖</div>
-        <div class="message-content typing-dots">
-            <span></span><span></span><span></span>
-        </div>
+        <span class="avatar">${type === 'bot' ? '🤖' : '👤'}</span>
+        <div class="text">${escapeHtml(text)}</div>
     `;
-    messagesContainer.appendChild(div);
-    rolarParaBaixo();
+    messagesDiv.appendChild(div);
+    messagesDiv.scrollTop = messagesDiv.scrollHeight;
+}
+
+function showTyping() {
+    const id = 'typing-' + Date.now();
+    const div = document.createElement('div');
+    div.className = 'message bot typing';
+    div.id = id;
+    div.innerHTML = `
+        <span class="avatar">🤖</span>
+        <div class="text">Pensando</div>
+    `;
+    messagesDiv.appendChild(div);
+    messagesDiv.scrollTop = messagesDiv.scrollHeight;
     return id;
 }
 
-function removerDigitando(id) {
-    const elemento = document.getElementById(id);
-    if (elemento) elemento.remove();
+function hideTyping(id) {
+    const el = document.getElementById(id);
+    if (el) el.remove();
 }
 
-function formatarTexto(texto) {
-    const seguro = escapeHtml(texto);
-    return seguro.replace(/\n/g, '<br>');
+async function getAIResponse(message) {
+    conversationHistory.push({ role: 'user', content: message });
+
+    // Aqui conecta com a API do seu backend / IA
+    // Por enquanto retorna resposta de demonstração
+    await new Promise(resolve => setTimeout(resolve, 800 + Math.random() * 700));
+
+    const responses = [
+        "Entendi! Vou ajudar você com isso. No ClubeWins buscamos sempre as melhores soluções.",
+        "Ótima pergunta! Deixe-me explicar de forma clara e objetiva...",
+        "Estou analisando as informações. Aqui está o que encontrei para você:",
+        "Claro! Fico feliz em poder auxiliar. Vamos lá:"
+    ];
+
+    const respostaBase = responses[Math.floor(Math.random() * responses.length)];
+    conversationHistory.push({ role: 'assistant', content: respostaBase });
+    
+    return `${respostaBase}\n\nVocê disse: "${message}"\n\nEm breve conectarei com inteligência completa! 🚀`;
 }
 
-function escapeHtml(texto) {
+function escapeHtml(text) {
     const div = document.createElement('div');
-    div.textContent = texto;
-    return div.innerHTML;
+    div.textContent = text;
+    return div.innerHTML.replace(/\n/g, '<br>');
 }
-
-function rolarParaBaixo() {
-    messagesContainer.scrollTop = messagesContainer.scrollHeight;
-}
-
-chatForm.addEventListener('submit', enviarMensagem);
-inputElement.addEventListener('keydown', (e) => {
-    if (e.key === 'Enter' && !e.shiftKey) {
-        e.preventDefault();
-        enviarMensagem();
-    }
-});
-
-document.addEventListener('DOMContentLoaded', () => {
-    inputElement.focus();
-});
