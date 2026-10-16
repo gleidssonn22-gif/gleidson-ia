@@ -31,7 +31,7 @@ jobs:
         run: npm install -g @stlite/cloudflare
 
       - name: Build app
-        run: npx stlite-cloudflare build --entrypoint src/main.py . -o ./dist
+        run: npx stlite-cloudflare build . --entrypoint src/main.py --out ../deploy-dist
 
       - name: Deploy to Cloudflare
         uses: cloudflare/wrangler-action@v3
@@ -39,4 +39,4 @@ jobs:
           apiToken: ${{ secrets.CLOUDFLARE_API_TOKEN }}
           accountId: ${{ secrets.CLOUDFLARE_ACCOUNT_ID }}
           command: deploy
-          workingDirectory: dist
+          workingDirectory: ../deploy-dist
