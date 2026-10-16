@@ -1,0 +1,51 @@
+﻿name: Deploy Gleidson IA to Cloudflare
+
+on:
+  push:
+    branches: [ main ]
+
+jobs:
+  build-and-deploy:
+    runs-on: ubuntu-24.04
+    steps:
+      - name: Baixar código
+        uses: actions/checkout@v4
+
+      - name: Instalar Python
+        uses: actions/setup-python@v5
+        with:
+          python-version: "3.12"
+
+      - name: Instalar uv
+        run: curl -LsSf https://astral.sh/uv/install.sh | sh
+
+      - name: Adicionar uv ao PATH
+        run: echo "$HOME/.cargo/bin" >> $GITHUB_PATH
+
+      - name: Instalar dependências
+        run: uv pip install -r requirements.txt --system
+
+      - name: Instalar Node.js
+        uses: actions/setup-node@v4
+        with:
+          node-version: "22"
+
+      - name: Instalar stlite-cloudflare
+        run: npm install -g @stlite/cloudflare
+
+      - name: Construir o app
+        run: |
+          rm -rf saida
+          mkdir -p saida
+          npx stlite-cloudflare build . --entrypoint src/main.py --out saida
+
+      - name: Verificar arquivos gerados
+        run: ls -la saida
+
+      - name: Publicar no Cloudflare
+        uses: cloudflare/wrangler-action@v3
+        with:
+          apiToken: ${{ secrets.CLOUDFLARE_API_TOKEN }}
+          accountId: ${{ secrets.CLOUDFLARE_ACCOUNT_ID }}
+          workingDirectory: saida
+          command: deploy --yes
