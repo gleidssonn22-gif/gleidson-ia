@@ -1,105 +1,80 @@
-ï»¿const form = document.getElementById('chat-form');
-const input = document.getElementById('message-input');
-const messagesDiv = document.getElementById('messages');
-
-let conversationHistory = [];
-const API_KEY = "";
-
-form.addEventListener('submit', async (e) => {
-    e.preventDefault();
-    const message = input.value.trim();
-    if (!message) return;
-
-    addMessage('user', message);
-    input.value = '';
-    input.disabled = true;
+// Histórico de mensagens melhorado para a IA
+function appendMessage(text, sender) {
+    const chatMessages = document.getElementById('chat-messages');
+    const msgDiv = document.createElement('div');
+    msgDiv.classList.add('message');
+    msgDiv.classList.add(sender === 'ai' ? 'ai-msg' : 'user-msg');
     
-    const typingId = showTyping();
+    // Suporte a quebras de linha automáticas no texto da IA
+    msgDiv.innerHTML = text.replace(/\n/g, '<br>');
+    
+    chatMessages.appendChild(msgDiv);
+    chatMessages.scrollTop = chatMessages.scrollHeight;
+}
 
-    try {
-        const response = await getAIResponse(message);
-        hideTyping(typingId);
-        addMessage('bot', response);
-    } catch (error) {
-        hideTyping(typingId);
-        addMessage('bot', 'Desculpe, tive um problema. Tente novamente em instantes.');
-        console.error(error);
-    } finally {
-        input.disabled = false;
-        input.focus();
+// Indicador de "Digitando..."
+function showTypingIndicator() {
+    const chatMessages = document.getElementById('chat-messages');
+    const typingDiv = document.createElement('div');
+    typingDiv.classList.add('message', 'ai-msg');
+    typingDiv.id = 'typing-indicator';
+    typingDiv.textContent = 'Gleidson IA está digitando...';
+    chatMessages.appendChild(typingDiv);
+    chatMessages.scrollTop = chatMessages.scrollHeight;
+}
+
+function removeTypingIndicator() {
+    const typingDiv = document.getElementById('typing-indicator');
+    if (typingDiv) {
+        typingDiv.remove();
     }
-});
-
-function addMessage(type, text) {
-    const div = document.createElement('div');
-    div.className = `message ${type}`;
-    div.innerHTML = `
-        <span class="avatar">${type === 'bot' ? 'ðŸ¤–' : 'ðŸ‘¤'}</span>
-        <div class="text">${escapeHtml(text)}</div>
-    `;
-    messagesDiv.appendChild(div);
-    messagesDiv.scrollTop = messagesDiv.scrollHeight;
 }
 
-function showTyping() {
-    const id = 'typing-' + Date.now();
-    const div = document.createElement('div');
-    div.className = 'message bot typing';
-    div.id = id;
-    div.innerHTML = `
-        <span class="avatar">ðŸ¤–</span>
-        <div class="text">Pensando</div>
-    `;
-    messagesDiv.appendChild(div);
-    messagesDiv.scrollTop = messagesDiv.scrollHeight;
-    return id;
+// Funções do Chat do Gleidson IA
+const chatMessages = document.getElementById('chat-messages');
+const userInput = document.getElementById('user-input');
+
+function sendPrompt(text) {
+    userInput.value = text;
+    sendMessage();
 }
 
-function hideTyping(id) {
-    const el = document.getElementById(id);
-    if (el) el.remove();
+function sendMessage() {
+    const text = userInput.value.trim();
+    if (!text) return;
+
+    // Envia mensagem do usuário
+    appendMessage(text, 'user');
+    userInput.value = '';
+
+    showTypingIndicator();
+
+    // Cérebro atualizado do Gleidson IA
+    setTimeout(() => {
+        removeTypingIndicator();
+        let reply = "Entendido! Como criador e mente por trás do Clube Wins, o Gleidson me programou para te ajudar com tudo por aqui. O que mais manda?";
+        
+        const lowerText = text.toLowerCase();
+        
+        if (lowerText.includes('o que é o clube wins') || lowerText.includes('site')) {
+            reply = "?? O Clube Wins (clubewins.com.br) é a plataforma oficial de entretenimento, jogos e tecnologia criada por Gleidson Pereira de Souza.";
+        } else if (lowerText.includes('quem é você') || lowerText.includes('gleidson ia')) {
+            reply = "?? Eu sou o **Gleidson IA**, o assistente oficial do site! Fui desenvolvido para auxiliar visitantes, gerenciar interações e somar no ecossistema do Clube Wins.";
+        } else if (lowerText.includes('jogos') || lowerText.includes('arcade')) {
+            reply = "??? Acesse nossa seção de Arcade logo acima para testar seus reflexos e se divertir com os minijogos exclusivos da plataforma!";
+        } else if (lowerText.includes('criador') || lowerText.includes('dono')) {
+            reply = "O projeto foi idealizado e construído por **Gleidson Pereira de Souza** usando tecnologias modernas como Cloudflare Pages, Git e IA de ponta.";
+        }
+
+        appendMessage(reply, 'ai');
+    }, 1000);
 }
 
-async function getAIResponse(mensagem) {
-    const url = `https://generativelanguage.googleapis.com/v1beta/models/gemini-2.0-flash:generateContent?key=${API_KEY}`;
-
-    const historico = conversationHistory.slice(-6).map(turn => 
-        `${turn.role === 'user' ? 'UsuÃ¡rio' : 'Assistente'}: ${turn.content}`
-    ).join('\n');
-
-    const corpo = {
-        contents: [{
-            parts: [{
-                text: "VocÃª Ã© o Gleidson IA, assistente oficial do Clube Wins. Responda de forma amigÃ¡vel, direta e profissional.\nHistÃ³rico da conversa:\n" + historico + "\n\nPergunta: " + mensagem
-            }]
-        }]
-    };
-
-    conversationHistory.push({ role: 'user', content: mensagem });
-
-    const resposta = await fetch(url, {
-        method: 'POST',
-        headers: { 'Content-Type': 'application/json' },
-        body: JSON.stringify(corpo)
+// Permitir envio com a tecla Enter
+if (userInput) {
+    userInput.addEventListener('keypress', function(e) {
+        if (e.key === 'Enter') {
+            sendMessage();
+        }
     });
-
-    if (!resposta.ok) {
-        const erro = await resposta.json();
-        console.error(erro);
-        return `Erro: ${erro.error?.message || resposta.statusText}`;
-    }
-
-    const dados = await resposta.json();
-    const texto = dados.candidates?.[0]?.content?.parts?.[0]?.text;
-    
-    if (!texto) return "NÃ£o consegui gerar resposta.";
-
-    conversationHistory.push({ role: 'assistant', content: texto });
-    return texto;
-}
-
-function escapeHtml(text) {
-    const div = document.createElement('div');
-    div.textContent = text;
-    return div.innerHTML.replace(/\n/g, '<br>');
 }
