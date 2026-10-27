@@ -5,54 +5,16 @@ on:
     branches: [ main ]
 
 jobs:
-  build-and-deploy:
+  deploy:
     runs-on: ubuntu-24.04
     steps:
       - name: Baixar código
         uses: actions/checkout@v4
 
-      - name: Instalar Python
-        uses: actions/setup-python@v5
-        with:
-          python-version: "3.12"
-
-      - name: Instalar uv
-        run: curl -LsSf https://astral.sh/uv/install.sh | sh
-
-      - name: Adicionar uv ao PATH
-        run: |
-          echo "$HOME/.local/bin" >> $GITHUB_PATH
-          echo "$HOME/.cargo/bin" >> $GITHUB_PATH
-
-      - name: Instalar dependências
-        run: uv pip install -r requirements.txt --system
-
-      - name: Instalar Node.js
-        uses: actions/setup-node@v4
-        with:
-          node-version: "22"
-
-      - name: Instalar stlite-cloudflare
-        run: npm install -g @stlite/cloudflare
-
-      - name: Construir o app
-        run: |
-          rm -rf "$RUNNER_TEMP/saida"
-          mkdir -p "$RUNNER_TEMP/saida"
-          npx stlite-cloudflare build . --entrypoint src/main.py --out "$RUNNER_TEMP/saida"
-
-      - name: Verificar arquivos gerados
-        run: ls -la "$RUNNER_TEMP/saida"
-
-      - name: Publicar no Cloudflare
+      - name: Publicar site e assistente
         uses: cloudflare/wrangler-action@v4
         with:
           apiToken: ${{ secrets.CLOUDFLARE_API_TOKEN }}
           accountId: ${{ secrets.CLOUDFLARE_ACCOUNT_ID }}
           wranglerVersion: "4.114.0"
-          workingDirectory: ${{ runner.temp }}/saida
           command: deploy
-
-
-
-
