@@ -45,12 +45,14 @@ jobs:
         run: ls -la "$RUNNER_TEMP/saida"
 
       - name: Publicar no Cloudflare
-        uses: cloudflare/wrangler-action@v3
+        uses: cloudflare/wrangler-action@v4
         with:
           apiToken: ${{ secrets.CLOUDFLARE_API_TOKEN }}
           accountId: ${{ secrets.CLOUDFLARE_ACCOUNT_ID }}
+          wranglerVersion: "4.114.0"
           workingDirectory: ${{ runner.temp }}/saida
           command: deploy
+
 
 
 
