@@ -1,80 +1,86 @@
-// HistÛrico de mensagens melhorado para a IA
+const chatMessages = document.getElementById("chat-messages");
+const chatForm = document.getElementById("chat-form");
+const userInput = document.getElementById("user-input");
+const sendButton = document.getElementById("enviar-btn");
+const statusLabel = document.getElementById("status-label");
+const statusDot = document.getElementById("status-dot");
+
 function appendMessage(text, sender) {
-    const chatMessages = document.getElementById('chat-messages');
-    const msgDiv = document.createElement('div');
-    msgDiv.classList.add('message');
-    msgDiv.classList.add(sender === 'ai' ? 'ai-msg' : 'user-msg');
-    
-    // Suporte a quebras de linha autom·ticas no texto da IA
-    msgDiv.innerHTML = text.replace(/\n/g, '<br>');
-    
-    chatMessages.appendChild(msgDiv);
-    chatMessages.scrollTop = chatMessages.scrollHeight;
-}
+    const message = document.createElement("div");
+    message.className = `message ${sender === "ai" ? "ai-message" : "user-message"}`;
 
-// Indicador de "Digitando..."
-function showTypingIndicator() {
-    const chatMessages = document.getElementById('chat-messages');
-    const typingDiv = document.createElement('div');
-    typingDiv.classList.add('message', 'ai-msg');
-    typingDiv.id = 'typing-indicator';
-    typingDiv.textContent = 'Gleidson IA est· digitando...';
-    chatMessages.appendChild(typingDiv);
-    chatMessages.scrollTop = chatMessages.scrollHeight;
-}
-
-function removeTypingIndicator() {
-    const typingDiv = document.getElementById('typing-indicator');
-    if (typingDiv) {
-        typingDiv.remove();
+    if (sender === "ai") {
+        const avatar = document.createElement("div");
+        avatar.className = "message-avatar";
+        avatar.setAttribute("aria-hidden", "true");
+        avatar.textContent = "ü§ñ";
+        message.appendChild(avatar);
     }
+
+    const content = document.createElement("div");
+    content.className = "message-content";
+    text.split("\n").forEach((line, index) => {
+        if (index) content.appendChild(document.createElement("br"));
+        content.appendChild(document.createTextNode(line));
+    });
+    message.appendChild(content);
+    chatMessages.appendChild(message);
+    chatMessages.scrollTop = chatMessages.scrollHeight;
+    return message;
 }
 
-// FunÁıes do Chat do Gleidson IA
-const chatMessages = document.getElementById('chat-messages');
-const userInput = document.getElementById('user-input');
-
-function sendPrompt(text) {
-    userInput.value = text;
-    sendMessage();
+function setStatus(label, online = false) {
+    statusLabel.textContent = label;
+    statusDot.style.backgroundColor = online ? "#10b981" : "#f59e0b";
 }
 
-function sendMessage() {
+function showTypingIndicator() {
+    const indicator = appendMessage("Gleidson IA est√° digitando...", "ai");
+    indicator.id = "typing-indicator";
+    indicator.setAttribute("aria-label", "Aguardando resposta do assistente");
+}
+
+chatForm.addEventListener("submit", async (event) => {
+    event.preventDefault();
     const text = userInput.value.trim();
-    if (!text) return;
+    if (!text || sendButton.disabled) return;
 
-    // Envia mensagem do usu·rio
-    appendMessage(text, 'user');
-    userInput.value = '';
-
+    appendMessage(text, "user");
+    userInput.value = "";
+    sendButton.disabled = true;
+    userInput.disabled = true;
+    setStatus("Conectando‚Ä¶");
     showTypingIndicator();
 
-    // CÈrebro atualizado do Gleidson IA
-    setTimeout(() => {
-        removeTypingIndicator();
-        let reply = "Entendido! Como criador e mente por tr·s do Clube Wins, o Gleidson me programou para te ajudar com tudo por aqui. O que mais manda?";
-        
-        const lowerText = text.toLowerCase();
-        
-        if (lowerText.includes('o que È o clube wins') || lowerText.includes('site')) {
-            reply = "?? O Clube Wins (clubewins.com.br) È a plataforma oficial de entretenimento, jogos e tecnologia criada por Gleidson Pereira de Souza.";
-        } else if (lowerText.includes('quem È vocÍ') || lowerText.includes('gleidson ia')) {
-            reply = "?? Eu sou o **Gleidson IA**, o assistente oficial do site! Fui desenvolvido para auxiliar visitantes, gerenciar interaÁıes e somar no ecossistema do Clube Wins.";
-        } else if (lowerText.includes('jogos') || lowerText.includes('arcade')) {
-            reply = "??? Acesse nossa seÁ„o de Arcade logo acima para testar seus reflexos e se divertir com os minijogos exclusivos da plataforma!";
-        } else if (lowerText.includes('criador') || lowerText.includes('dono')) {
-            reply = "O projeto foi idealizado e construÌdo por **Gleidson Pereira de Souza** usando tecnologias modernas como Cloudflare Pages, Git e IA de ponta.";
+    try {
+        const response = await fetch("/chat/", {
+            method: "POST",
+            headers: { "Content-Type": "application/json", "Accept": "application/json" },
+            body: JSON.stringify({ message: text })
+        });
+        const data = await response.json().catch(() => ({}));
+        if (!response.ok) {
+            throw new Error(typeof data.detail === "string" ? data.detail : "O servi√ßo de IA n√£o conseguiu responder.");
         }
-
-        appendMessage(reply, 'ai');
-    }, 1000);
-}
-
-// Permitir envio com a tecla Enter
-if (userInput) {
-    userInput.addEventListener('keypress', function(e) {
-        if (e.key === 'Enter') {
-            sendMessage();
+        if (typeof data.response !== "string" || !data.response.trim()) {
+            throw new Error("O servi√ßo de IA retornou uma resposta vazia.");
         }
-    });
+        setStatus("Online", true);
+        appendMessage(data.response, "ai");
+    } catch (error) {
+        setStatus("Indispon√≠vel");
+        appendMessage("N√£o consegui conectar ao assistente agora. Tente novamente em instantes.", "ai");
+        console.error("Falha ao consultar o assistente:", error);
+    } finally {
+        document.getElementById("typing-indicator")?.remove();
+        sendButton.disabled = false;
+        userInput.disabled = false;
+        userInput.focus();
+    }
+});
+
+try {
+    (window.adsbygoogle = window.adsbygoogle || []).push({});
+} catch (error) {
+    console.info("O an√∫ncio ser√° exibido quando o AdSense estiver dispon√≠vel.");
 }

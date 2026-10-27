@@ -14,13 +14,19 @@ Base.metadata.create_all(bind=engine)
 app = FastAPI(title="Gleidson AI - Clubewins API", version="1.1")
 
 api_key = os.getenv("GEMINI_API_KEY")
-client = genai.Client(api_key=api_key)
+client = genai.Client(api_key=api_key) if api_key else None
 
 class ChatRequest(BaseModel):
     message: str
 
+@app.get("/")
+def read_root():
+    return {"status": "online"}
+
 @app.post("/chat/")
 def chat_endpoint(request: ChatRequest, db: Session = Depends(get_db)):
+    if client is None:
+        raise HTTPException(status_code=503, detail="Serviço de IA não configurado.")
     try:
         system_instruction = (
             "Você é o assistente oficial inteligente do ecossistema clubewins.com.br. "
@@ -79,3 +85,5 @@ def listar_historico(db: Session = Depends(get_db)):
             } for h in historico
         ]
     }
+
+

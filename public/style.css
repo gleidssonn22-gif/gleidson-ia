@@ -315,3 +315,24 @@ body {
         font-size: 0.95rem;
     }
 }
+
+/* Publicidade integrada ao topo do assistente */
+.ad-area {
+    width: min(100% - 32px, 900px);
+    min-height: 90px;
+    margin: 12px auto 0;
+    padding: 8px 12px;
+    border: 1px solid var(--borda);
+    border-radius: 12px;
+    background: var(--bg-superficie);
+}
+.ad-label {
+    display: block;
+    margin-bottom: 4px;
+    color: var(--texto-fraco);
+    font-size: 0.65rem;
+    letter-spacing: 0.08em;
+    text-align: center;
+    text-transform: uppercase;
+}
+.ad-unit { min-height: 50px; }

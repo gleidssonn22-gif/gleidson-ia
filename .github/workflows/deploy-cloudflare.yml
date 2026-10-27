@@ -1,4 +1,4 @@
-﻿name: Deploy Gleidson IA to Cloudflare
+name: Deploy Gleidson IA to Cloudflare
 
 on:
   push:
@@ -37,17 +37,19 @@ jobs:
 
       - name: Construir o app
         run: |
-          rm -rf saida
-          mkdir -p saida
-          npx stlite-cloudflare build . --entrypoint src/main.py --out saida
+          rm -rf "$RUNNER_TEMP/saida"
+          mkdir -p "$RUNNER_TEMP/saida"
+          npx stlite-cloudflare build . --entrypoint src/main.py --out "$RUNNER_TEMP/saida"
 
       - name: Verificar arquivos gerados
-        run: ls -la saida
+        run: ls -la "$RUNNER_TEMP/saida"
 
       - name: Publicar no Cloudflare
         uses: cloudflare/wrangler-action@v3
         with:
           apiToken: ${{ secrets.CLOUDFLARE_API_TOKEN }}
           accountId: ${{ secrets.CLOUDFLARE_ACCOUNT_ID }}
-          workingDirectory: saida
+          workingDirectory: ${{ runner.temp }}/saida
           command: deploy --yes
+
+
