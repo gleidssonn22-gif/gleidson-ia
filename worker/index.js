@@ -21,6 +21,111 @@ const SYSTEM_INSTRUCTION = [
     "Não diga que pesquisou na internet ou executou ações que não fez."
 ].join(" ");
 
+// Conteúdo editorial revisado do próprio site. Atualize estes documentos quando
+// os recursos, guias ou políticas do Gleidson IA mudarem.
+const KNOWLEDGE_BASE = [
+    {
+        title: "O que é o Gleidson IA",
+        path: "/",
+        keywords: ["gleidson ia", "assistente", "inteligencia artificial", "ajuda", "capacidades"],
+        content: "O Gleidson IA é um assistente de inteligência artificial do site Clube Wins. Ajuda com perguntas gerais, explicações, escrita, ideias, estudos, resumos e rascunhos. Pode cometer erros; informações importantes devem ser conferidas em fontes confiáveis."
+    },
+    {
+        title: "Como pedir ajuda ao assistente",
+        path: "/guias/como-usar-gleidson-ia/",
+        keywords: ["guia", "usar", "prompt", "pedido", "contexto", "revisar", "rascunho", "estudo"],
+        content: "Um bom pedido diz o resultado desejado, o assunto, o público ou nível de conhecimento e o formato da resposta. Para melhorar uma resposta, peça um exemplo, um resumo ou outro nível de detalhe. Não envie senhas, documentos, dados financeiros, informações de saúde ou conteúdo confidencial. Revise fatos, nomes e números antes de usar ou compartilhar uma resposta."
+    },
+    {
+        title: "Exemplos de prompts para estudar e escrever",
+        path: "/guias/prompts-para-estudar-e-escrever/",
+        keywords: ["exemplos", "prompts", "estudar", "escrever", "texto", "explicar", "revisar", "organizar"],
+        content: "Para aprender: peça uma explicação adequada ao seu nível, um exemplo concreto e perguntas para praticar. Para estudar: informe o tempo disponível e os tópicos. Para revisar: peça clareza e gramática, preserve seu ponto de vista e não acrescente fatos. Para rascunhos: informe público, objetivo, tom e tamanho, e peça para sinalizar informações que faltam em vez de inventá-las. Os exemplos são sugestões e precisam ser conferidos."
+    },
+    {
+        title: "Ferramentas e ações disponíveis no chat",
+        path: "/chat/",
+        keywords: ["atalhos", "ferramentas", "publicacao", "enquete", "resumo", "conversa", "acao", "votar"],
+        content: "Os atalhos do chat ajudam a responder dúvidas, criar rascunhos de publicações, montar enquetes e resumir a conversa atual. O assistente prepara sugestões: não publica textos, não envia enquetes, não vota e não altera contas. O resumo usa o histórico recente da sessão aberta; recarregar a página ou iniciar uma nova conversa apaga esse histórico da página."
+    },
+    {
+        title: "Desafio diário e pontuação pessoal",
+        path: "/chat/",
+        keywords: ["quiz", "desafio", "pontos", "pontuacao", "diario", "temas", "ranking"],
+        content: "O desafio do dia é um quiz educativo de conhecimentos gerais, tecnologia, ciência ou esportes. Uma resposta correta soma cinco pontos pessoais, guardados no armazenamento local deste navegador. Esses pontos não são enviados ao Clube Wins e não alteram ranking, resultados ou prêmios oficiais."
+    },
+    {
+        title: "Informações oficiais do Clube Wins",
+        path: "/",
+        keywords: ["clube wins", "regras", "premios", "pagamentos", "cadastro", "ranking oficial", "pontuacao oficial"],
+        content: "O Gleidson IA não tem uma fonte oficial conectada para confirmar regras, cadastro, prêmios, pagamentos ou ranking do Clube Wins. Não invente nem deduza essas informações. Informe que não há confirmação disponível no assistente e recomende consultar os canais oficiais do Clube Wins."
+    },
+    {
+        title: "Privacidade e dados enviados ao assistente",
+        path: "/privacidade/",
+        keywords: ["privacidade", "dados", "mensagens", "armazenamento", "google", "gemini", "cookies", "avaliacao"],
+        content: "As mensagens e o histórico recente enviados no chat são processados pela API Gemini do Google para gerar respostas. O site solicita que a interação não seja armazenada pela API, mas isso não garante retenção zero pelo provedor. A política de privacidade descreve o tratamento e recomenda não enviar informações confidenciais. Avaliações registram somente o tipo de avaliação, o recurso e o horário, sem o texto da conversa. O quiz e os pontos pessoais ficam no armazenamento local do navegador. As páginas editoriais podem exibir anúncios; a tela de conversa não carrega anúncios."
+    },
+    {
+        title: "Contato do site",
+        path: "/privacidade/",
+        keywords: ["contato", "email", "e-mail", "falar", "privacidade", "solicitacao"],
+        content: "Para dúvidas sobre a Política de Privacidade ou pedidos relacionados ao tratamento de informações pelo site, escreva para gleidssonn22@gmail.com. A página de privacidade explica quais informações podem ser tratadas e como fazer pedidos."
+    },
+    {
+        title: "Público do assistente",
+        path: "/chat/",
+        keywords: ["idade", "maior", "18 anos", "menor", "publico", "gemini"],
+        content: "O chat do Gleidson IA é destinado somente a pessoas com 18 anos ou mais. A página pede que a pessoa confirme essa idade antes de conversar, conforme os termos aplicáveis ao uso da API Gemini."
+    }
+];
+
+const KNOWLEDGE_STOP_WORDS = new Set([
+    "a", "as", "ao", "aos", "com", "da", "das", "de", "do", "dos", "e", "em", "eu", "me", "o", "os", "ou", "para", "por", "que", "qual", "quais", "um", "uma"
+]);
+
+function normalizeKnowledgeText(value) {
+    return value
+        .normalize("NFD")
+        .replace(/[\u0300-\u036f]/g, "")
+        .toLocaleLowerCase("pt-BR");
+}
+
+function findKnowledge(message) {
+    const normalizedQuery = normalizeKnowledgeText(message);
+    const terms = [...new Set(normalizedQuery.match(/[a-z0-9]{3,}/g) || [])]
+        .filter((term) => !KNOWLEDGE_STOP_WORDS.has(term));
+    if (terms.length === 0) return [];
+
+    return KNOWLEDGE_BASE.map((document) => {
+        const title = normalizeKnowledgeText(document.title);
+        const keywords = normalizeKnowledgeText(document.keywords.join(" "));
+        const content = normalizeKnowledgeText(document.content);
+        let score = 0;
+        for (const term of terms) {
+            if (keywords.includes(term)) score += 4;
+            if (title.includes(term)) score += 3;
+            if (content.includes(term)) score += 1;
+        }
+        if (normalizedQuery.length >= 7 && keywords.includes(normalizedQuery)) score += 3;
+        return { ...document, score };
+    })
+        .filter((document) => document.score >= 4)
+        .sort((first, second) => second.score - first.score)
+        .slice(0, 3);
+}
+
+function buildSystemInstruction(message) {
+    const sources = findKnowledge(message);
+    if (sources.length === 0) return SYSTEM_INSTRUCTION;
+
+    const context = sources.map((source) =>
+        `Fonte: ${source.title} (https://clubewins.com.br${source.path})\n${source.content}`
+    ).join("\n\n");
+
+    return `${SYSTEM_INSTRUCTION}\n\nBase de conhecimento do site, selecionada para esta pergunta:\n${context}\n\nUse estes trechos como referência para informações sobre o site. Não os extrapole. Se citar uma informação do site, inclua o link da fonte correspondente. Se a resposta não estiver na base, diga que não tem confirmação e indique os canais oficiais quando isso tratar do Clube Wins.`;
+}
+
 const QUIZ_SCHEMA = {
     type: "object",
     properties: {
@@ -164,7 +269,7 @@ async function handleChat(request, env) {
 
     const generated = await generateWithGemini(env, {
         model: "gemini-3.5-flash-lite",
-        system_instruction: SYSTEM_INSTRUCTION,
+        system_instruction: buildSystemInstruction(conversation.input.at(-1).content[0].text),
         input: conversation.input,
         store: false
     });
