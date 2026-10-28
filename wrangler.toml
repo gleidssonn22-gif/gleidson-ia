@@ -8,3 +8,11 @@ directory = "./public"
 binding = "ASSETS"
 run_worker_first = ["/chat/*"]
 
+[[ratelimits]]
+name = "CHAT_LIMITER"
+namespace_id = "839271"
+
+[ratelimits.simple]
+limit = 10
+period = 60
+

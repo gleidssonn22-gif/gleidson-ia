@@ -14,5 +14,15 @@
       "pattern": "clubewins.com.br/chat/*",
       "zone_name": "clubewins.com.br"
     }
+  ],
+  "ratelimits": [
+    {
+      "name": "CHAT_LIMITER",
+      "namespace_id": "839271",
+      "simple": {
+        "limit": 10,
+        "period": 60
+      }
+    }
   ]
 }
