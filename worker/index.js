@@ -23,19 +23,20 @@ async function handleChat(request, env) {
         return json({ detail: "A mensagem deve ter entre 1 e 12.000 caracteres." }, 400);
     }
 
-    const endpoint = new URL("https://generativelanguage.googleapis.com/v1beta/models/gemini-3.8-flash:generateContent");
-    endpoint.searchParams.set("key", env.GEMINI_API_KEY);
+    const endpoint = "https://generativelanguage.googleapis.com/v1beta/models/gemini-3.8-flash:generateContent";
 
     try {
         const result = await fetch(endpoint, {
             method: "POST",
-            headers: { "Content-Type": "application/json" },
+            headers: {
+                "Content-Type": "application/json",
+                "x-goog-api-key": env.GEMINI_API_KEY
+            },
             body: JSON.stringify({
                 systemInstruction: {
                     parts: [{ text: "Você é o assistente oficial do Clube Wins. Responda em português do Brasil de forma clara, útil e respeitosa." }]
                 },
-                contents: [{ role: "user", parts: [{ text: message }] }],
-                generationConfig: { temperature: 0.3 }
+                contents: [{ role: "user", parts: [{ text: message }] }]
             })
         });
 
