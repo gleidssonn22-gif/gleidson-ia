@@ -48,6 +48,27 @@ test("sends recent turns to Gemini without storing the conversation", async () =
     }
 });
 
+test("serves the assistant page and its relative assets under /chat/", async () => {
+    const requestedAssets = [];
+    const assetsBinding = {
+        fetch: async (request) => {
+            const path = new URL(request.url).pathname;
+            requestedAssets.push(path);
+            return new Response(`asset:${path}`, { headers: { "Content-Type": "text/plain" } });
+        }
+    };
+    const environment = makeEnvironment({ ASSETS: assetsBinding });
+
+    const page = await worker.fetch(new Request("https://clubewins.com.br/chat/"), environment);
+    const css = await worker.fetch(new Request("https://clubewins.com.br/chat/style.css"), environment);
+    const script = await worker.fetch(new Request("https://clubewins.com.br/chat/script.js"), environment);
+
+    assert.equal(await page.text(), "asset:/index.html");
+    assert.equal(await css.text(), "asset:/style.css");
+    assert.equal(await script.text(), "asset:/script.js");
+    assert.deepEqual(requestedAssets, ["/index.html", "/style.css", "/script.js"]);
+});
+
 test("returns a clear rate limit response without calling Gemini", async () => {
     const originalFetch = globalThis.fetch;
     globalThis.fetch = async () => {

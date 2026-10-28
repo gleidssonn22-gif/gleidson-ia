@@ -3,6 +3,12 @@ const MAX_MESSAGE_LENGTH = 12000;
 const MAX_CONVERSATION_LENGTH = 24000;
 const QUIZ_THEMES = new Set(["conhecimentos gerais", "tecnologia", "ciência", "esportes"]);
 const FEEDBACK_FEATURES = new Set(["chat", "club-faq", "post-draft", "poll-draft", "summary", "daily-quiz"]);
+const CHAT_PAGE_ASSETS = new Map([
+    ["/chat/", "/index.html"],
+    ["/chat/index.html", "/index.html"],
+    ["/chat/style.css", "/style.css"],
+    ["/chat/script.js", "/script.js"]
+]);
 
 const SYSTEM_INSTRUCTION = [
     "Você é Gleidson IA, um assistente de propósito geral disponível na página do Clube Wins.",
@@ -250,9 +256,17 @@ async function handleFeedback(request, env) {
     return json({ status: "received" });
 }
 
+async function handleChatPageAsset(request, env, assetPath) {
+    const assetUrl = new URL(assetPath, request.url);
+    return env.ASSETS.fetch(new Request(assetUrl, request));
+}
+
 export default {
     async fetch(request, env) {
         const url = new URL(request.url);
+        if (request.method === "GET" && CHAT_PAGE_ASSETS.has(url.pathname)) {
+            return handleChatPageAsset(request, env, CHAT_PAGE_ASSETS.get(url.pathname));
+        }
         if (url.pathname === "/chat/quiz" || url.pathname === "/chat/quiz/") {
             return handleQuiz(request, env);
         }
