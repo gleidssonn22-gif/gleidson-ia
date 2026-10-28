@@ -28,15 +28,15 @@
     </header>
 
     <main class="chat-wrapper">
-        <section class="ad-area" aria-label="Publicidade">
+        <aside class="ad-area" aria-label="Publicidade">
             <span class="ad-label">Publicidade</span>
             <ins class="adsbygoogle ad-unit"
                  style="display:block"
                  data-ad-client="ca-pub-8005983262078707"
                  data-ad-slot="6767560576"
-                 data-ad-format="auto"
+                 data-ad-format="rectangle"
                  data-full-width-responsive="true"></ins>
-        </section>
+        </aside>
         <div id="chat-messages" class="messages-container" aria-live="polite" aria-label="Conversa">
             <div class="message ai-message">
                 <div class="message-avatar" aria-hidden="true">🤖</div>
@@ -50,15 +50,17 @@
     </main>
 
     <footer class="input-footer">
-        <form id="chat-form" class="input-form">
-            <input type="text" id="user-input" class="message-input" placeholder="Digite sua mensagem..." autocomplete="off" required aria-label="Sua mensagem">
-            <button type="submit" id="enviar-btn" class="send-button" aria-label="Enviar mensagem">
-                <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" aria-hidden="true">
-                    <path d="M22 2L11 13M22 2l-7 20-4-9-9-4 20-7z"/>
-                </svg>
-            </button>
-        </form>
-        <p class="disclaimer">A IA pode cometer erros. Sempre confira informações importantes.</p>
+        <div class="input-layout">
+            <form id="chat-form" class="input-form">
+                <input type="text" id="user-input" class="message-input" placeholder="Digite sua mensagem..." autocomplete="off" required aria-label="Sua mensagem">
+                <button type="submit" id="enviar-btn" class="send-button" aria-label="Enviar mensagem">
+                    <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" aria-hidden="true">
+                        <path d="M22 2L11 13M22 2l-7 20-4-9-9-4 20-7z"/>
+                    </svg>
+                </button>
+            </form>
+            <p class="disclaimer">A IA pode cometer erros. Sempre confira informações importantes.</p>
+        </div>
     </footer>
     <script src="script.js"></script>
 </body>

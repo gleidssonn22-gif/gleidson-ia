@@ -336,3 +336,90 @@ body {
     text-transform: uppercase;
 }
 .ad-unit { min-height: 50px; }
+
+/* Em telas largas, o anúncio ocupa a coluna lateral sem cobrir a conversa. */
+.chat-wrapper {
+    width: min(100%, 1280px);
+    min-height: 0;
+    margin: 0 auto;
+    padding: 16px 24px;
+    display: grid;
+    grid-template-columns: minmax(0, 1fr) 300px;
+    gap: 24px;
+}
+
+.messages-container {
+    grid-column: 1;
+    min-height: 0;
+    width: 100%;
+    max-width: 900px;
+    margin: 0 auto;
+}
+
+.ad-area {
+    grid-column: 2;
+    grid-row: 1;
+    align-self: start;
+    width: 100%;
+    max-width: 300px;
+    min-height: 280px;
+    margin: 12px 0;
+    padding: 12px;
+}
+
+.ad-unit { min-height: 250px; }
+
+.input-layout {
+    display: grid;
+    grid-template-columns: minmax(0, 1fr) 300px;
+    gap: 24px;
+    width: min(100%, 1280px);
+    margin: 0 auto;
+    padding: 0 24px;
+}
+
+.input-form,
+.disclaimer {
+    grid-column: 1;
+    width: min(100%, 900px);
+    margin-left: auto;
+    margin-right: auto;
+}
+
+@media (max-width: 1100px) {
+    .chat-wrapper {
+        display: flex;
+        flex-direction: column;
+        gap: 8px;
+        padding: 10px 16px;
+    }
+
+    .ad-area {
+        order: -1;
+        width: min(100%, 900px);
+        max-width: 900px;
+        min-height: 90px;
+        margin: 0 auto;
+        padding: 6px 10px;
+    }
+
+    .ad-unit { min-height: 50px; }
+
+    .messages-container {
+        width: 100%;
+        max-width: 900px;
+        margin: 0 auto;
+    }
+
+    .input-layout {
+        display: block;
+        width: 100%;
+        max-width: 900px;
+        padding: 0;
+    }
+
+    .input-form,
+    .disclaimer {
+        width: 100%;
+    }
+}
