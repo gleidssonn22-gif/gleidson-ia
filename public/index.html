@@ -37,13 +37,43 @@
                  data-ad-format="rectangle"
                  data-full-width-responsive="true"></ins>
         </aside>
+        <section class="assistant-tools" aria-label="Ferramentas do Gleidson IA">
+            <div class="tools-heading">
+                <h2>O que vamos fazer hoje?</h2>
+                <span id="personal-points" class="personal-points" aria-live="polite">Pontos pessoais: 0</span>
+            </div>
+            <div id="quick-actions" class="quick-actions">
+                <button type="button" class="quick-action" data-action="club-faq">Dúvidas do Clube</button>
+                <button type="button" class="quick-action" data-action="post-draft">Criar publicação</button>
+                <button type="button" class="quick-action" data-action="poll-draft">Montar enquete</button>
+                <button type="button" class="quick-action" data-action="summary">Resumir conversa</button>
+                <button type="button" id="daily-challenge-btn" class="quick-action quick-action-primary">Desafio do dia</button>
+            </div>
+            <details class="faq-panel">
+                <summary>Perguntas frequentes sobre o assistente</summary>
+                <div class="faq-content">
+                    <h3>O que o Gleidson IA pode fazer?</h3>
+                    <p>Responder perguntas gerais, ajudar com textos e ideias, estudar, resumir a conversa e montar rascunhos de publicações ou enquetes.</p>
+                    <h3>Ele publica, vota ou altera minha conta?</h3>
+                    <p>Não. Ele prepara sugestões para você revisar. Nada é publicado nem enviado à comunidade pelo assistente.</p>
+                    <h3>Como funciona o desafio?</h3>
+                    <p>Você pode responder a um quiz por dia. Uma resposta certa vale 5 pontos pessoais, salvos neste navegador. Eles não alteram o ranking oficial do Clube Wins.</p>
+                    <h3>O que acontece com a conversa?</h3>
+                    <p>O assistente usa as últimas mensagens enquanto esta página está aberta. Ao recarregar ou iniciar outra conversa, esse histórico é apagado.</p>
+                    <h3>Onde encontro regras oficiais do Clube Wins?</h3>
+                    <p>O assistente não tem uma fonte oficial de regras, prêmios ou pagamentos conectada. Ele deve avisar quando não souber, em vez de inventar.</p>
+                    <h3>Minha avaliação envia a conversa?</h3>
+                    <p>Não. O voto positivo ou negativo envia apenas a avaliação e o tipo de ajuda, sem o texto da conversa.</p>
+                </div>
+            </details>
+        </section>
         <div id="chat-messages" class="messages-container" aria-live="polite" aria-label="Conversa">
             <div class="message ai-message">
                 <div class="message-avatar" aria-hidden="true">🤖</div>
                 <div class="message-content">
                     <p><strong>Olá! Eu sou o Gleidson IA</strong> 🤖✨</p>
                     <p>Sou seu assistente de inteligência artificial. Posso ajudar com perguntas, textos, ideias, estudos e muito mais.</p>
-                    <p class="message-tip">💡 Experimente perguntar: “Como funciona a inteligência artificial?”</p>
+                    <p class="message-tip">💡 Use os atalhos acima para tirar dúvidas, preparar rascunhos ou responder ao desafio diário.</p>
                 </div>
             </div>
         </div>
@@ -59,6 +89,7 @@
                     </svg>
                 </button>
             </form>
+            <button type="button" id="clear-chat-btn" class="new-chat-button">Nova conversa</button>
             <p class="disclaimer">A IA pode cometer erros. Sempre confira informações importantes.</p>
         </div>
     </footer>

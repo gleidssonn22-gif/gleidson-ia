@@ -16,3 +16,10 @@ namespace_id = "839271"
 limit = 10
 period = 60
 
+[observability]
+enabled = true
+
+[observability.logs]
+enabled = true
+invocation_logs = false
+

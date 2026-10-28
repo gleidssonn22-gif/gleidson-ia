@@ -42,7 +42,7 @@ test("sends recent turns to Gemini without storing the conversation", async () =
         assert.equal(geminiRequest.store, false);
         assert.deepEqual(geminiRequest.input.map((step) => step.type), ["user_input", "model_output", "user_input"]);
         assert.match(geminiRequest.system_instruction, /propósito geral/);
-        assert.match(geminiRequest.system_instruction, /Não invente regras/);
+        assert.match(geminiRequest.system_instruction, /Não invente esses dados/);
     } finally {
         globalThis.fetch = originalFetch;
     }
@@ -109,5 +109,85 @@ test("rejects malformed and oversized conversation histories", async () => {
         assert.equal(invalidBody.status, 400);
     } finally {
         globalThis.fetch = originalFetch;
+    }
+});
+
+test("generates a validated daily quiz with Gemini structured output", async () => {
+    const originalFetch = globalThis.fetch;
+    let geminiRequest;
+    const quiz = {
+        question: "Qual é a unidade básica da informação digital?",
+        options: ["Bit", "Metro", "Watt", "Litro"],
+        correctIndex: 0,
+        explanation: "O bit representa o menor valor binário: zero ou um."
+    };
+    globalThis.fetch = async (_url, options) => {
+        geminiRequest = JSON.parse(options.body);
+        return Response.json({ steps: [{ type: "model_output", content: [{ type: "text", text: JSON.stringify(quiz) }] }] });
+    };
+
+    try {
+        const request = new Request("https://clubewins.com.br/chat/quiz", {
+            method: "POST",
+            headers: { "Content-Type": "application/json", "cf-connecting-ip": "203.0.113.10" },
+            body: JSON.stringify({ theme: "tecnologia" })
+        });
+        const response = await worker.fetch(request, makeEnvironment());
+        const data = await response.json();
+
+        assert.equal(response.status, 200);
+        assert.deepEqual(data.quiz, quiz);
+        assert.equal(data.theme, "tecnologia");
+        assert.equal(geminiRequest.store, false);
+        assert.equal(geminiRequest.response_format.mime_type, "application/json");
+        assert.deepEqual(geminiRequest.response_format.schema.required, ["question", "options", "correctIndex", "explanation"]);
+    } finally {
+        globalThis.fetch = originalFetch;
+    }
+});
+
+test("rejects an invalid quiz theme without calling Gemini", async () => {
+    const originalFetch = globalThis.fetch;
+    globalThis.fetch = async () => {
+        throw new Error("Gemini should not be called for an invalid quiz theme");
+    };
+
+    try {
+        const request = new Request("https://clubewins.com.br/chat/quiz", {
+            method: "POST",
+            headers: { "Content-Type": "application/json" },
+            body: JSON.stringify({ theme: "informações do Clube Wins" })
+        });
+        const response = await worker.fetch(request, makeEnvironment());
+
+        assert.equal(response.status, 400);
+    } finally {
+        globalThis.fetch = originalFetch;
+    }
+});
+
+test("logs feedback rating and feature without conversation text", async () => {
+    const originalConsoleLog = console.log;
+    const logs = [];
+    console.log = (entry) => logs.push(entry);
+
+    try {
+        const request = new Request("https://clubewins.com.br/chat/feedback", {
+            method: "POST",
+            headers: { "Content-Type": "application/json" },
+            body: JSON.stringify({ rating: "positive", feature: "post-draft", message: "private conversation text" })
+        });
+        const response = await worker.fetch(request, makeEnvironment());
+        const data = await response.json();
+        const logEntry = JSON.parse(logs[0]);
+
+        assert.equal(response.status, 200);
+        assert.equal(data.status, "received");
+        assert.equal(logEntry.event, "assistant_feedback");
+        assert.equal(logEntry.rating, "positive");
+        assert.equal(logEntry.feature, "post-draft");
+        assert.equal("message" in logEntry, false);
+    } finally {
+        console.log = originalConsoleLog;
     }
 });
