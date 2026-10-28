@@ -4,8 +4,8 @@ const MAX_CONVERSATION_LENGTH = 24000;
 const QUIZ_THEMES = new Set(["conhecimentos gerais", "tecnologia", "ciência", "esportes"]);
 const FEEDBACK_FEATURES = new Set(["chat", "club-faq", "post-draft", "poll-draft", "summary", "daily-quiz"]);
 const CHAT_PAGE_ASSETS = new Map([
-    ["/chat/", "/chat/index.html"],
-    ["/chat/index.html", "/chat/index.html"],
+    ["/chat/", "/chat/assistant.html"],
+    ["/chat/index.html", "/chat/assistant.html"],
     ["/chat/style.css", "/style.css"],
     ["/chat/script.js", "/script.js"]
 ]);

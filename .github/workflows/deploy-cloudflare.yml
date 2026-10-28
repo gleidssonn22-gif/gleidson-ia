@@ -14,7 +14,7 @@ jobs:
       - name: Preparar a página do assistente
         run: |
           mkdir -p public/chat
-          cp public/index.html public/chat/index.html
+          cp public/index.html public/chat/assistant.html
 
       - name: Publicar site e assistente
         uses: cloudflare/wrangler-action@v4

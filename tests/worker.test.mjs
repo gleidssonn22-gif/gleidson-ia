@@ -64,11 +64,11 @@ test("serves the assistant page and its relative assets under /chat/", async () 
     const css = await worker.fetch(new Request("https://clubewins.com.br/chat/style.css"), environment);
     const script = await worker.fetch(new Request("https://clubewins.com.br/chat/script.js"), environment);
 
-    assert.equal(await page.text(), "asset:/chat/index.html");
+    assert.equal(await page.text(), "asset:/chat/assistant.html");
     assert.equal(await css.text(), "asset:/style.css");
     assert.equal(await script.text(), "asset:/script.js");
     assert.deepEqual(requestedAssets, [
-        { path: "/chat/index.html", revision: "2026-10-28-assistant-ui" },
+        { path: "/chat/assistant.html", revision: "2026-10-28-assistant-ui" },
         { path: "/style.css", revision: "2026-10-28-assistant-ui" },
         { path: "/script.js", revision: "2026-10-28-assistant-ui" }
     ]);
