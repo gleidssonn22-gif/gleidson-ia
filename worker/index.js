@@ -33,7 +33,7 @@ async function handleChat(request, env) {
                 "x-goog-api-key": env.GEMINI_API_KEY
             },
             body: JSON.stringify({
-                model: "gemini-3.8-flash",
+                model: "gemini-3.5-flash-lite",
                 system_instruction: "Você é o assistente oficial do Clube Wins. Responda em português do Brasil de forma clara, útil e respeitosa.",
                 input: message,
                 store: false
