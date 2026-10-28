@@ -11,6 +11,11 @@ jobs:
       - name: Baixar código
         uses: actions/checkout@v4
 
+      - name: Preparar a página do assistente
+        run: |
+          mkdir -p public/chat
+          cp public/index.html public/chat/index.html
+
       - name: Publicar site e assistente
         uses: cloudflare/wrangler-action@v4
         with:
