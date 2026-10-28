@@ -9,6 +9,7 @@ const CHAT_PAGE_ASSETS = new Map([
     ["/chat/style.css", "/style.css"],
     ["/chat/script.js", "/script.js"]
 ]);
+const CHAT_PAGE_ASSET_VERSION = "2026-10-28-assistant-ui";
 
 const SYSTEM_INSTRUCTION = [
     "Você é Gleidson IA, um assistente de propósito geral disponível na página do Clube Wins.",
@@ -258,6 +259,7 @@ async function handleFeedback(request, env) {
 
 async function handleChatPageAsset(request, env, assetPath) {
     const assetUrl = new URL(assetPath, request.url);
+    assetUrl.searchParams.set("assistant-ui", CHAT_PAGE_ASSET_VERSION);
     return env.ASSETS.fetch(new Request(assetUrl, request));
 }
 

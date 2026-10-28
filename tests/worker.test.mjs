@@ -52,8 +52,9 @@ test("serves the assistant page and its relative assets under /chat/", async () 
     const requestedAssets = [];
     const assetsBinding = {
         fetch: async (request) => {
-            const path = new URL(request.url).pathname;
-            requestedAssets.push(path);
+            const assetUrl = new URL(request.url);
+            const path = assetUrl.pathname;
+            requestedAssets.push({ path, revision: assetUrl.searchParams.get("assistant-ui") });
             return new Response(`asset:${path}`, { headers: { "Content-Type": "text/plain" } });
         }
     };
@@ -66,7 +67,11 @@ test("serves the assistant page and its relative assets under /chat/", async () 
     assert.equal(await page.text(), "asset:/index.html");
     assert.equal(await css.text(), "asset:/style.css");
     assert.equal(await script.text(), "asset:/script.js");
-    assert.deepEqual(requestedAssets, ["/index.html", "/style.css", "/script.js"]);
+    assert.deepEqual(requestedAssets, [
+        { path: "/index.html", revision: "2026-10-28-assistant-ui" },
+        { path: "/style.css", revision: "2026-10-28-assistant-ui" },
+        { path: "/script.js", revision: "2026-10-28-assistant-ui" }
+    ]);
 });
 
 test("returns a clear rate limit response without calling Gemini", async () => {
