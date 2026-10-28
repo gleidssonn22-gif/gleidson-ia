@@ -23,7 +23,7 @@ async function handleChat(request, env) {
         return json({ detail: "A mensagem deve ter entre 1 e 12.000 caracteres." }, 400);
     }
 
-    const endpoint = "https://generativelanguage.googleapis.com/v1beta/models/gemini-3.8-flash:generateContent";
+    const endpoint = "https://generativelanguage.googleapis.com/v1beta/interactions";
 
     try {
         const result = await fetch(endpoint, {
@@ -33,21 +33,25 @@ async function handleChat(request, env) {
                 "x-goog-api-key": env.GEMINI_API_KEY
             },
             body: JSON.stringify({
-                systemInstruction: {
-                    parts: [{ text: "Você é o assistente oficial do Clube Wins. Responda em português do Brasil de forma clara, útil e respeitosa." }]
-                },
-                contents: [{ role: "user", parts: [{ text: message }] }]
+                model: "gemini-3.8-flash",
+                system_instruction: "Você é o assistente oficial do Clube Wins. Responda em português do Brasil de forma clara, útil e respeitosa.",
+                input: message,
+                store: false
             })
         });
 
         if (!result.ok) {
-            console.error("Gemini API respondeu com status", result.status);
+            const error = await result.json().catch(() => null);
+            console.error("Gemini API respondeu com status", result.status, error?.error?.message || "");
             return json({ detail: "Não foi possível gerar uma resposta agora." }, 502);
         }
 
         const data = await result.json();
-        const answer = data.candidates?.[0]?.content?.parts
-            ?.map((part) => part.text || "")
+        const answer = data.steps
+            ?.filter((step) => step.type === "model_output")
+            .flatMap((step) => step.content || [])
+            .filter((part) => part.type === "text")
+            .map((part) => part.text || "")
             .join("")
             .trim();
 
