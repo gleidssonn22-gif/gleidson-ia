@@ -3,23 +3,26 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <meta name="description" content="Gleidson IA — assistente inteligente do Clube Wins para perguntas, ideias e muito mais.">
-    <meta name="google-adsense-account" content="ca-pub-8005983262078707">
+    <meta name="description" content="Converse com o Gleidson IA para tirar dúvidas, estudar, preparar rascunhos e responder ao desafio diário.">
     <title>Gleidson IA | Clube Wins</title>
     <link rel="stylesheet" href="style.css">
     <link rel="icon" type="image/svg+xml" href="data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 100 100'%3E%3Ctext y='.9em' font-size='90'%3EG%3C/text%3E%3C/svg%3E">
-    <script async src="https://pagead2.googlesyndication.com/pagead/js/adsbygoogle.js?client=ca-pub-8005983262078707" crossorigin="anonymous"></script>
 </head>
 <body>
     <header class="app-header">
         <div class="header-wrapper">
-            <a href="index.html" class="brand" aria-label="Gleidson IA, início">
+            <a href="/" class="brand" aria-label="Gleidson IA, início">
                 <div class="brand-icon">G</div>
                 <div class="brand-text">
                     <span class="brand-name">Gleidson <strong>IA</strong></span>
                     <span class="brand-tag">Clube Wins</span>
                 </div>
             </a>
+            <nav class="assistant-nav" aria-label="Navegação principal">
+                <a href="/">Início</a>
+                <a href="/guias/">Guias</a>
+                <a href="/privacidade/">Privacidade</a>
+            </nav>
             <div class="connection-status" aria-live="polite">
                 <span class="status-dot" id="status-dot" style="background:#f59e0b"></span>
                 <span class="status-label" id="status-label">Assistente</span>
@@ -27,16 +30,17 @@
         </div>
     </header>
 
-    <main class="chat-wrapper">
-        <aside class="ad-area" aria-label="Publicidade">
-            <span class="ad-label">Publicidade</span>
-            <ins class="adsbygoogle ad-unit"
-                 style="display:block"
-                 data-ad-client="ca-pub-8005983262078707"
-                 data-ad-slot="6767560576"
-                 data-ad-format="rectangle"
-                 data-full-width-responsive="true"></ins>
-        </aside>
+    <section id="age-gate" class="age-gate" aria-labelledby="age-gate-title">
+        <div class="age-gate-card">
+            <p class="age-gate-label">Antes de começar</p>
+            <h1 id="age-gate-title">Assistente para maiores de 18 anos</h1>
+            <p>O Gleidson IA usa a API Gemini. Para continuar, confirme que você tem 18 anos ou mais. Não envie senhas, documentos ou informações confidenciais.</p>
+            <button type="button" id="age-confirm-btn" class="quick-action quick-action-primary">Confirmo que tenho 18 anos ou mais</button>
+            <a class="age-exit-link" href="/">Voltar para o site</a>
+        </div>
+    </section>
+
+    <main class="chat-wrapper" hidden>
         <section class="assistant-tools" aria-label="Ferramentas do Gleidson IA">
             <div class="tools-heading">
                 <h2>O que vamos fazer hoje?</h2>
@@ -79,7 +83,7 @@
         </div>
     </main>
 
-    <footer class="input-footer">
+    <footer class="input-footer" hidden>
         <div class="input-layout">
             <form id="chat-form" class="input-form">
                 <input type="text" id="user-input" class="message-input" placeholder="Digite sua mensagem..." autocomplete="off" required aria-label="Sua mensagem">
@@ -90,7 +94,7 @@
                 </button>
             </form>
             <button type="button" id="clear-chat-btn" class="new-chat-button">Nova conversa</button>
-            <p class="disclaimer">A IA pode cometer erros. Sempre confira informações importantes.</p>
+            <p class="disclaimer">Assistente para maiores de 18 anos. A IA pode cometer erros; confira informações importantes e não envie dados confidenciais.</p>
         </div>
     </footer>
     <script src="script.js"></script>

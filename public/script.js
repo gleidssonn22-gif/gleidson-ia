@@ -8,6 +8,10 @@ const quickActions = document.getElementById("quick-actions");
 const dailyChallengeButton = document.getElementById("daily-challenge-btn");
 const personalPoints = document.getElementById("personal-points");
 const clearChatButton = document.getElementById("clear-chat-btn");
+const ageGate = document.getElementById("age-gate");
+const ageConfirmButton = document.getElementById("age-confirm-btn");
+const chatWrapper = document.querySelector(".chat-wrapper");
+const inputFooter = document.querySelector(".input-footer");
 const conversationHistory = [];
 const MAX_HISTORY_MESSAGES = 12;
 const MAX_CONVERSATION_LENGTH = 24000;
@@ -440,8 +444,9 @@ clearChatButton.addEventListener("click", () => {
 
 updatePersonalPoints();
 
-try {
-    (window.adsbygoogle = window.adsbygoogle || []).push({});
-} catch (error) {
-    console.info("O anúncio será exibido quando o AdSense estiver disponível.");
-}
+ageConfirmButton.addEventListener("click", () => {
+    ageGate.hidden = true;
+    chatWrapper.hidden = false;
+    inputFooter.hidden = false;
+    userInput.focus();
+});

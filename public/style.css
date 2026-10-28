@@ -704,3 +704,58 @@ body {
         margin-left: 0;
     }
 }
+
+/* Anúncios ficam nas páginas editoriais; o chat permanece focado no assistente. */
+.ad-area { display: none; }
+.chat-wrapper {
+    grid-template-columns: minmax(0, 1fr);
+    max-width: 960px;
+}
+.assistant-tools,
+.messages-container { grid-column: 1; }
+.input-layout { grid-template-columns: minmax(0, 1fr); }
+.chat-wrapper[hidden],
+.input-footer[hidden],
+.age-gate[hidden] { display: none !important; }
+.assistant-nav {
+    display: flex;
+    flex-wrap: wrap;
+    align-items: center;
+    gap: 14px;
+}
+.assistant-nav a {
+    color: var(--texto);
+    font-size: 0.78rem;
+    opacity: 0.9;
+    text-decoration: none;
+}
+.assistant-nav a:hover { text-decoration: underline; }
+.age-gate {
+    display: grid;
+    flex: 1;
+    place-items: center;
+    padding: 28px 18px;
+}
+.age-gate-card {
+    width: min(100%, 560px);
+    padding: 28px;
+    border: 1px solid var(--borda);
+    border-radius: var(--raio-borda);
+    background: var(--bg-superficie);
+    box-shadow: 0 14px 45px rgba(0, 0, 0, 0.2);
+}
+.age-gate-label {
+    margin-bottom: 6px;
+    color: #cbc6ff;
+    font-size: 0.75rem;
+    font-weight: 700;
+    letter-spacing: 0.08em;
+    text-transform: uppercase;
+}
+.age-gate-card h1 { margin-bottom: 10px; font-size: 1.45rem; }
+.age-gate-card p:not(.age-gate-label) { margin-bottom: 18px; color: var(--texto-fraco); line-height: 1.6; }
+.age-exit-link { display: inline-block; margin-left: 12px; color: var(--texto-fraco); font-size: 0.85rem; }
+
+@media (max-width: 1100px) {
+    .assistant-nav { gap: 9px; }
+}
