@@ -48,6 +48,49 @@ test("sends recent turns to Gemini without storing the conversation", async () =
     }
 });
 
+test("retrieves matching site knowledge with a source link for the current question", async () => {
+    const originalFetch = globalThis.fetch;
+    let geminiRequest;
+    globalThis.fetch = async (_url, options) => {
+        geminiRequest = JSON.parse(options.body);
+        return Response.json({ steps: [{ type: "model_output", content: [{ type: "text", text: "O chat aceita texto." }] }] });
+    };
+
+    try {
+        const response = await worker.fetch(makeRequest([
+            { role: "user", content: "Quais imagens e arquivos posso enviar?" }
+        ]), makeEnvironment());
+
+        assert.equal(response.status, 200);
+        assert.match(geminiRequest.system_instruction, /não oferece um botão para anexar imagens ou arquivos/);
+        assert.match(geminiRequest.system_instruction, /https:\/\/clubewins\.com\.br\/chat\//);
+    } finally {
+        globalThis.fetch = originalFetch;
+    }
+});
+
+test("uses recent user turns to retrieve knowledge for a short follow-up", async () => {
+    const originalFetch = globalThis.fetch;
+    let geminiRequest;
+    globalThis.fetch = async (_url, options) => {
+        geminiRequest = JSON.parse(options.body);
+        return Response.json({ steps: [{ type: "model_output", content: [{ type: "text", text: "Somente texto." }] }] });
+    };
+
+    try {
+        const response = await worker.fetch(makeRequest([
+            { role: "user", content: "Quero saber se o chat aceita imagens ou arquivos." },
+            { role: "assistant", content: "A tela atual aceita mensagens de texto." },
+            { role: "user", content: "E documentos?" }
+        ]), makeEnvironment());
+
+        assert.equal(response.status, 200);
+        assert.match(geminiRequest.system_instruction, /não oferece um botão para anexar imagens ou arquivos/);
+    } finally {
+        globalThis.fetch = originalFetch;
+    }
+});
+
 test("serves the assistant page and its relative assets under /chat/", async () => {
     const requestedAssets = [];
     const assetsBinding = {

@@ -49,6 +49,24 @@ const KNOWLEDGE_BASE = [
         content: "Os atalhos do chat ajudam a responder dúvidas, criar rascunhos de publicações, montar enquetes e resumir a conversa atual. O assistente prepara sugestões: não publica textos, não envia enquetes, não vota e não altera contas. O resumo usa o histórico recente da sessão aberta; recarregar a página ou iniciar uma nova conversa apaga esse histórico da página."
     },
     {
+        title: "Rascunhos de publicações e enquetes",
+        path: "/chat/",
+        keywords: ["publicação", "post", "postagem", "publicar", "comunidade", "enquete", "pergunta", "opções", "votação"],
+        content: "Para preparar uma publicação, pergunte à pessoa o tema e o tom desejado e entregue um rascunho para revisão. Para uma enquete, pergunte o assunto e sugira uma pergunta clara com opções de resposta. Sinalize informações que precisam de confirmação. O Gleidson IA não publica, não envia enquetes à comunidade e não vota."
+    },
+    {
+        title: "Resumos e memória entre conversas",
+        path: "/chat/",
+        keywords: ["resumo", "resumir", "lembrar", "memoria", "historico", "conversa antiga", "sessao", "recarregar"],
+        content: "O assistente pode resumir os pontos da conversa atual. Se a pessoa pedir um resumo antes de enviar conteúdo, peça que cole o material que deseja resumir. O chat só recebe o histórico recente da sessão aberta; ao recarregar a página ou começar outra conversa, o histórico anterior não fica disponível. Não afirme que lembra conversas passadas."
+    },
+    {
+        title: "Mensagens e anexos no chat",
+        path: "/chat/",
+        keywords: ["anexo", "arquivo", "imagem", "foto", "pdf", "documento", "texto", "colar"],
+        content: "A tela atual do chat aceita mensagens de texto e não oferece um botão para anexar imagens ou arquivos. Para pedir ajuda com um trecho, a pessoa pode colar o texto que tem autorização para compartilhar. Oriente a remover dados pessoais ou confidenciais antes de enviar."
+    },
+    {
         title: "Desafio diário e pontuação pessoal",
         path: "/chat/",
         keywords: ["quiz", "desafio", "pontos", "pontuacao", "diario", "temas", "ranking"],
@@ -65,6 +83,30 @@ const KNOWLEDGE_BASE = [
         path: "/privacidade/",
         keywords: ["privacidade", "dados", "mensagens", "armazenamento", "google", "gemini", "cookies", "avaliacao"],
         content: "As mensagens e o histórico recente enviados no chat são processados pela API Gemini do Google para gerar respostas. O site solicita que a interação não seja armazenada pela API, mas isso não garante retenção zero pelo provedor. A política de privacidade descreve o tratamento e recomenda não enviar informações confidenciais. Avaliações registram somente o tipo de avaliação, o recurso e o horário, sem o texto da conversa. O quiz e os pontos pessoais ficam no armazenamento local do navegador. As páginas editoriais podem exibir anúncios; a tela de conversa não carrega anúncios."
+    },
+    {
+        title: "Avaliações das respostas",
+        path: "/privacidade/",
+        keywords: ["avaliação", "avaliar", "feedback", "positivo", "negativo", "curtir", "voto", "conversa"],
+        content: "Ao avaliar uma resposta, o site envia a avaliação positiva ou negativa e o nome do recurso avaliado. O registro inclui o horário, mas não inclui o texto da conversa. A política de privacidade descreve esse tratamento."
+    },
+    {
+        title: "Publicidade e anúncios no site",
+        path: "/privacidade/",
+        keywords: ["anúncio", "anuncios", "publicidade", "adsense", "propaganda", "chat", "cookies"],
+        content: "O Google AdSense pode exibir anúncios nas páginas editoriais do Clube Wins. A tela de conversa do Gleidson IA não carrega o código de anúncios. O Google e outros fornecedores podem usar cookies ou identificadores conforme as configurações e políticas de privacidade. A pessoa pode ajustar a personalização nas Configurações de anúncios do Google; consulte a Política de Privacidade do site para os links e detalhes."
+    },
+    {
+        title: "Conferência de fatos e limites das respostas",
+        path: "/guias/como-usar-gleidson-ia/",
+        keywords: ["erro", "confiabilidade", "fonte", "fato", "atualizado", "atualidade", "internet", "pesquisa", "certeza"],
+        content: "O assistente pode errar fatos, interpretar mal um pedido ou não ter informação atualizada. Nesta versão ele não pesquisa na internet em tempo real e não deve dizer que fez uma busca. Para assuntos atuais ou importantes, peça uma fonte oficial à pessoa ou recomende que confira diretamente uma fonte confiável. Verifique datas, nomes, números e citações antes de usar uma resposta."
+    },
+    {
+        title: "Limites para orientação profissional",
+        path: "/guias/como-usar-gleidson-ia/",
+        keywords: ["medico", "saude", "juridico", "advogado", "financeiro", "investimento", "profissional", "conselho"],
+        content: "O Gleidson IA pode ajudar a explicar conceitos gerais, mas não substitui orientação profissional de saúde, jurídica ou financeira. Para decisões nessas áreas, consulte um profissional qualificado e confira informações importantes em fontes confiáveis."
     },
     {
         title: "Contato do site",
@@ -91,23 +133,30 @@ function normalizeKnowledgeText(value) {
         .toLocaleLowerCase("pt-BR");
 }
 
+function knowledgeTerms(value) {
+    return (normalizeKnowledgeText(value).match(/[a-z0-9]{3,}/g) || []).map((term) => {
+        if (term.endsWith("oes") || term.endsWith("aes")) return `${term.slice(0, -3)}ao`;
+        if (term.length > 4 && term.endsWith("ns")) return `${term.slice(0, -2)}m`;
+        if (term.length > 3 && term.endsWith("s") && !term.endsWith("is")) return term.slice(0, -1);
+        return term;
+    });
+}
+
 function findKnowledge(message) {
-    const normalizedQuery = normalizeKnowledgeText(message);
-    const terms = [...new Set(normalizedQuery.match(/[a-z0-9]{3,}/g) || [])]
+    const terms = [...new Set(knowledgeTerms(message))]
         .filter((term) => !KNOWLEDGE_STOP_WORDS.has(term));
     if (terms.length === 0) return [];
 
     return KNOWLEDGE_BASE.map((document) => {
-        const title = normalizeKnowledgeText(document.title);
-        const keywords = normalizeKnowledgeText(document.keywords.join(" "));
-        const content = normalizeKnowledgeText(document.content);
+        const title = new Set(knowledgeTerms(document.title));
+        const keywords = new Set(knowledgeTerms(document.keywords.join(" ")));
+        const content = new Set(knowledgeTerms(document.content));
         let score = 0;
         for (const term of terms) {
-            if (keywords.includes(term)) score += 4;
-            if (title.includes(term)) score += 3;
-            if (content.includes(term)) score += 1;
+            if (keywords.has(term)) score += 4;
+            if (title.has(term)) score += 3;
+            if (content.has(term)) score += 1;
         }
-        if (normalizedQuery.length >= 7 && keywords.includes(normalizedQuery)) score += 3;
         return { ...document, score };
     })
         .filter((document) => document.score >= 4)
@@ -267,9 +316,16 @@ async function handleChat(request, env) {
     const conversation = readConversation(body);
     if (conversation.error) return json({ detail: conversation.error }, 400);
 
+    const retrievalQuery = conversation.input
+        .filter((step) => step.type === "user_input")
+        .slice(-3)
+        .map((step) => step.content[0].text)
+        .join(" ")
+        .slice(-4000);
+
     const generated = await generateWithGemini(env, {
         model: "gemini-3.5-flash-lite",
-        system_instruction: buildSystemInstruction(conversation.input.at(-1).content[0].text),
+        system_instruction: buildSystemInstruction(retrievalQuery),
         input: conversation.input,
         store: false
     });
