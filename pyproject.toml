@@ -9,9 +9,14 @@ description = "Assistente de IA pessoal do Gleidson"
 readme = "README.md"
 requires-python = ">=3.10"
 dependencies = [
-    "google-genai>=1.0.0",
+    "fastapi>=0.115.0",
+    "uvicorn>=0.32.0",
+    "google-genai>=1.5.0",
     "python-dotenv>=1.0.0",
-    "streamlit>=1.30.0"
+    "pydantic>=2.9.0",
+    "pydantic-settings>=2.6.0",
+    "sqlalchemy>=2.0.35",
+    "httpx>=0.27.2"
 ]
 
 [tool.setuptools.packages.find]

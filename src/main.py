@@ -1,6 +1,7 @@
 import os
-from fastapi import FastAPI, Depends, HTTPException
-from pydantic import BaseModel
+import hmac
+from fastapi import FastAPI, Depends, Header, HTTPException
+from pydantic import BaseModel, Field
 from sqlalchemy.orm import Session
 from google import genai
 from google.genai import errors
@@ -17,7 +18,7 @@ api_key = os.getenv("GEMINI_API_KEY")
 client = genai.Client(api_key=api_key) if api_key else None
 
 class ChatRequest(BaseModel):
-    message: str
+    message: str = Field(min_length=1, max_length=12000)
 
 @app.get("/")
 def read_root():
@@ -45,6 +46,8 @@ def chat_endpoint(request: ChatRequest, db: Session = Depends(get_db)):
         )
         
         resposta_texto = response.text
+        if not resposta_texto:
+            raise HTTPException(status_code=502, detail="A IA não retornou uma resposta.")
 
         nova_interacao = MensagemChat(
             user_message=request.message,
@@ -60,19 +63,34 @@ def chat_endpoint(request: ChatRequest, db: Session = Depends(get_db)):
             "response": resposta_texto
         }
 
-    except errors.APIError as e:
+    except errors.APIError:
+        db.rollback()
         raise HTTPException(
-            status_code=500, 
-            detail=f"Erro ao processar a solicitação com o Gemini: {e}"
+            status_code=502,
+            detail="Não foi possível processar a solicitação com o serviço de IA."
         )
-    except Exception as e:
+    except HTTPException:
+        db.rollback()
+        raise
+    except Exception:
+        db.rollback()
         raise HTTPException(
-            status_code=500, 
-            detail=f"Erro interno no servidor: {str(e)}"
+            status_code=500,
+            detail="Ocorreu um erro interno ao processar a solicitação."
         )
 
 @app.get("/historico/")
-def listar_historico(db: Session = Depends(get_db)):
+def listar_historico(
+    db: Session = Depends(get_db),
+    authorization: str | None = Header(default=None),
+):
+    history_token = os.getenv("API_HISTORY_TOKEN")
+    if not history_token:
+        raise HTTPException(status_code=503, detail="O acesso ao histórico não está configurado.")
+    scheme, _, supplied_token = (authorization or "").partition(" ")
+    if scheme.lower() != "bearer" or not hmac.compare_digest(supplied_token, history_token):
+        raise HTTPException(status_code=401, detail="Autenticação necessária.", headers={"WWW-Authenticate": "Bearer"})
+
     historico = db.query(MensagemChat).order_by(MensagemChat.created_at.desc()).all()
     return {
         "total_conversas": len(historico),

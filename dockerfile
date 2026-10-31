@@ -13,8 +13,8 @@ RUN pip install --no-cache-dir -r requirements.txt
 # Copia todo o resto do código do Gleidson para dentro do container
 COPY . .
 
-# Expõe a porta padrão que o Streamlit usa (8501)
-EXPOSE 8501
+# Expõe a porta da API FastAPI
+EXPOSE 8000
 
-# Comando para rodar a aplicação web quando o container iniciar
-CMD ["streamlit", "run", "app.py", "--server.address=0.0.0.0", "--server.port=8501"]
+# Inicia a aplicação que existe no pacote src
+CMD ["uvicorn", "src.main:app", "--host", "0.0.0.0", "--port", "8000"]

@@ -1,0 +1,15 @@
+.env
+.git/
+.git-rewrite/
+.venv/
+venv/
+env/
+ENV/
+__pycache__/
+*.py[cod]
+*.db
+*.sqlite3
+.pytest_cache/
+.wrangler/
+oracleJdk-27/
+gleidson_assistant.egg-info/

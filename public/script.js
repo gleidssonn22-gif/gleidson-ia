@@ -52,13 +52,33 @@ function getLocalDateKey(date = new Date()) {
 }
 
 function getPersonalStats() {
-    const saved = readLocalJson(POINTS_STORAGE_KEY, {});
+    const saved = readLocalJson(POINTS_STORAGE_KEY, {}) || {};
     return {
         points: Number.isSafeInteger(saved.points) && saved.points >= 0 ? saved.points : 0,
         correctAnswers: Number.isSafeInteger(saved.correctAnswers) && saved.correctAnswers >= 0 ? saved.correctAnswers : 0,
         streak: Number.isSafeInteger(saved.streak) && saved.streak >= 0 ? saved.streak : 0,
         lastCompletedDay: typeof saved.lastCompletedDay === "string" ? saved.lastCompletedDay : ""
     };
+}
+
+function isValidQuiz(quiz) {
+    return Boolean(
+        quiz
+        && typeof quiz === "object"
+        && typeof quiz.question === "string"
+        && quiz.question.trim().length >= 10
+        && quiz.question.length <= 360
+        && Array.isArray(quiz.options)
+        && quiz.options.length === 4
+        && quiz.options.every((option) => typeof option === "string" && option.trim() && option.length <= 180)
+        && new Set(quiz.options.map((option) => option.trim().toLocaleLowerCase("pt-BR"))).size === 4
+        && Number.isInteger(quiz.correctIndex)
+        && quiz.correctIndex >= 0
+        && quiz.correctIndex < 4
+        && typeof quiz.explanation === "string"
+        && quiz.explanation.trim().length > 0
+        && quiz.explanation.length <= 600
+    );
 }
 
 function updatePersonalPoints() {
@@ -393,7 +413,7 @@ async function startDailyChallenge() {
     const dayKey = getLocalDateKey();
     const dailyKey = `${DAILY_QUIZ_STORAGE_PREFIX}${dayKey}`;
     const cachedQuiz = readLocalJson(dailyKey, null);
-    if (cachedQuiz && Array.isArray(cachedQuiz.options)) {
+    if (isValidQuiz(cachedQuiz)) {
         renderQuizCard(cachedQuiz, cachedQuiz.theme || todayTheme(dayKey), dayKey);
         return;
     }
@@ -416,7 +436,7 @@ async function startDailyChallenge() {
             body: JSON.stringify({ theme })
         });
         const data = await response.json().catch(() => ({}));
-        if (!response.ok || !data.quiz) {
+        if (!response.ok || !isValidQuiz(data.quiz)) {
             throw new Error(typeof data.detail === "string" ? data.detail : "Não foi possível preparar o desafio. Tente novamente.");
         }
 
